@@ -1,3 +1,6 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>解碼局 任務庫</title>
@@ -199,7 +202,8 @@ button:focus-visible{outline:2px solid var(--amber);outline-offset:2px}
   text-transform:uppercase;padding-top:4px}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
-
+</head>
+<body>
 <script>
 /* 診斷用：iPad/iOS 上看不到 console，所以把錯誤直接畫在頁面上 */
 (function(){
@@ -1050,3 +1054,5 @@ function start(seed){
 window.claude?.hot?.snapshot?.(()=>S);
 if(window.claude?.hot?.ready) window.claude.hot.ready(start); else start(window.claude?.hot?.data);
 </script>
+</body>
+</html>
