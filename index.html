@@ -864,13 +864,33 @@ function voiceGate(t,k,slot){
     if(CAN_SPEAK){
       const play=(slow)=>{
         btns().forEach(b=>b.disabled=true); row.classList.add("speaking");
-        speak(txt,slow,()=>{ row.classList.remove("speaking");
-          btns().forEach(b=>b.disabled=false); unlock();
-          if(done[idx]) btns().forEach(b=>{ if(b.classList.contains("vmic")||b.classList.contains("vdone")) b.disabled=true; });
-        });
+        let settled=false;
+        const restore=()=>{
+          if(settled) return; settled=true;
+          row.classList.remove("speaking");
+          btns().forEach(b=>b.disabled=false);
+          unlock();
+          if(done[idx]){ const m=row.querySelector(".vmic")||row.querySelector(".vdone"); if(m) m.disabled=true; }
+        };
+        // 語音引擎不保證回報播完（macOS/Chrome 常見），沒有這道超時就會把按鈕永遠鎖住
+        const cap=setTimeout(restore, Math.max(4500, txt.length*170));
+        speak(txt,slow,()=>{ clearTimeout(cap); restore(); });
       };
       row.querySelector(".vlisten").addEventListener("click",()=>play(false));
       row.querySelector(".vslow").addEventListener("click",()=>play(true));
+      // 最後保險：萬一示範完全播不出聲，也要讓他能往下走，絕不卡死
+      setTimeout(()=>{
+        if(done[idx]) return;
+        unlock();
+        const note=row.querySelector(".vfallback");
+        if(!note && row.querySelector(".vdone,.vmic")){
+          const n=document.createElement("div");
+          n.className="vfallback vheard";
+          n.style.marginTop="2px";
+          n.textContent="聽不到示範？照你會的唸法唸出聲就好，不用等它。";
+          row.appendChild(n);
+        }
+      }, 7000);
     }
 
     const pass=(score)=>{
