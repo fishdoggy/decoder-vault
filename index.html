@@ -1,3 +1,5 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
 <title>解碼局 任務庫</title>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Noto+Sans+TC:wght@400;500;700&display=swap">
@@ -12,6 +14,9 @@
   --sans:"Noto Sans TC",system-ui,-apple-system,"PingFang TC","Microsoft JhengHei",sans-serif;
 }
 *{box-sizing:border-box}
+/* 必須擺在所有元件樣式之前：.decoded 這類設了 display 的 class 會壓過瀏覽器
+   對 hidden 屬性的預設 display:none，解碼器翻譯就會一開始就洩漏出來 */
+[hidden]{display:none!important}
 body{background:var(--ink);color:var(--text);font-family:var(--sans);margin:0;
   padding-block:14px;padding-left:16px;padding-right:16px;min-height:100vh;-webkit-text-size-adjust:100%}
 .wrap{max-width:560px;margin:0 auto;display:flex;flex-direction:column;gap:12px}
@@ -865,32 +870,25 @@ function voiceGate(t,k,slot){
       const play=(slow)=>{
         btns().forEach(b=>b.disabled=true); row.classList.add("speaking");
         let settled=false;
-        const restore=()=>{
+        // timedOut 為真＝語音引擎沒回報播完（macOS/Chrome 常見），此時才提示他不用等
+        const restore=(timedOut)=>{
           if(settled) return; settled=true;
           row.classList.remove("speaking");
           btns().forEach(b=>b.disabled=false);
           unlock();
           if(done[idx]){ const m=row.querySelector(".vmic")||row.querySelector(".vdone"); if(m) m.disabled=true; }
+          if(timedOut && !row.querySelector(".vfallback")){
+            const n=document.createElement("div");
+            n.className="vfallback vheard"; n.style.marginTop="2px";
+            n.textContent="聽不到示範？照你會的唸法唸出聲就好，不用等它。";
+            row.appendChild(n);
+          }
         };
-        // 語音引擎不保證回報播完（macOS/Chrome 常見），沒有這道超時就會把按鈕永遠鎖住
-        const cap=setTimeout(restore, Math.max(4500, txt.length*170));
-        speak(txt,slow,()=>{ clearTimeout(cap); restore(); });
+        const cap=setTimeout(()=>restore(true), Math.max(4500, txt.length*170));
+        speak(txt,slow,()=>{ clearTimeout(cap); restore(false); });
       };
       row.querySelector(".vlisten").addEventListener("click",()=>play(false));
       row.querySelector(".vslow").addEventListener("click",()=>play(true));
-      // 最後保險：萬一示範完全播不出聲，也要讓他能往下走，絕不卡死
-      setTimeout(()=>{
-        if(done[idx]) return;
-        unlock();
-        const note=row.querySelector(".vfallback");
-        if(!note && row.querySelector(".vdone,.vmic")){
-          const n=document.createElement("div");
-          n.className="vfallback vheard";
-          n.style.marginTop="2px";
-          n.textContent="聽不到示範？照你會的唸法唸出聲就好，不用等它。";
-          row.appendChild(n);
-        }
-      }, 7000);
     }
 
     const pass=(score)=>{
