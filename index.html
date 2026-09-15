@@ -1,0 +1,998 @@
+<title>解碼局 任務庫</title>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Noto+Sans+TC:wght@400;500;700&display=swap">
+<style>
+:root{
+  --ink:#10151E; --shell:#1A2231; --shell2:#232D3F; --line:#31405A;
+  --amber:#F6A93B; --amber-dim:#9C6C24; --amber-wash:rgba(246,169,59,.13);
+  --text:#C6D2E4; --dim:#7C8BA5;
+  --paper:#FAFAF8; --paper-ink:#1B1F26; --paper-dim:#6B7280; --paper-line:#E3E3DF;
+  --good:#5BC98C; --bad:#FF7452;
+  --mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+  --sans:"Noto Sans TC",system-ui,-apple-system,"PingFang TC","Microsoft JhengHei",sans-serif;
+}
+*{box-sizing:border-box}
+body{background:var(--ink);color:var(--text);font-family:var(--sans);margin:0;
+  padding-block:14px;padding-left:16px;padding-right:16px;min-height:100vh;-webkit-text-size-adjust:100%}
+.wrap{max-width:560px;margin:0 auto;display:flex;flex-direction:column;gap:12px}
+
+.top{display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:20px;
+  font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--dim)}
+.brand{display:flex;align-items:center;gap:7px;color:var(--amber);cursor:pointer;background:none;
+  border:none;padding:0;font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase}
+.dot{width:6px;height:6px;border-radius:50%;background:var(--amber);box-shadow:0 0 8px var(--amber);
+  animation:pulse 2.6s ease-in-out infinite;flex-shrink:0}
+@keyframes pulse{50%{opacity:.35}}
+.cells{display:flex;gap:4px;align-items:center}
+.cell{width:11px;height:5px;border-radius:1px;background:var(--amber)}
+.cell.off{background:var(--line)}
+
+/* ── 賽程選單 ── */
+.menu-head{padding:6px 2px 2px;display:flex;flex-direction:column;gap:7px}
+.menu-head h1{font-size:21px;margin:0;color:#fff;letter-spacing:.01em;font-weight:700}
+.menu-head p{margin:0;font-size:13.5px;line-height:1.75;color:var(--dim);max-width:46ch}
+.bands{display:flex;flex-direction:column;gap:10px}
+.band{background:var(--shell);border:1px solid var(--line);border-radius:12px;padding:15px 16px;
+  display:flex;flex-direction:column;gap:9px;cursor:pointer;text-align:left;width:100%;
+  font-family:var(--sans);color:var(--text);transition:border-color .15s,background .15s}
+.band:hover{border-color:var(--amber-dim);background:var(--shell2)}
+.band:focus-visible{outline:2px solid var(--amber);outline-offset:2px}
+.band-top{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.band-name{font-size:16.5px;font-weight:700;color:#fff}
+.bars{display:flex;gap:3px;align-items:center;flex-shrink:0}
+.bar{width:4px;border-radius:1px;background:var(--line)}
+.bar.on{background:var(--amber)}
+.bar:nth-child(1){height:7px} .bar:nth-child(2){height:11px} .bar:nth-child(3){height:15px}
+.band-desc{font-size:13px;line-height:1.7;color:var(--dim);margin:0}
+.band-foot{display:flex;gap:14px;align-items:center;font-family:var(--mono);font-size:10.5px;
+  letter-spacing:.1em;color:var(--dim);border-top:1px solid var(--line);padding-top:9px}
+.band-foot .done{color:var(--good)}
+
+/* ── 驗收方式切換 ── */
+.modebar{display:flex;align-items:center;gap:7px;padding:11px 13px;background:var(--shell);
+  border:1px solid var(--line);border-radius:11px;flex-wrap:wrap}
+.modebar .lab{font-family:var(--mono);font-size:10.5px;letter-spacing:.14em;color:var(--dim);
+  text-transform:uppercase;margin-right:auto}
+.modebar button{padding:8px 12px;font-size:12px;font-weight:600;border-radius:8px;flex:0 0 auto}
+.modebar button.on{background:var(--amber-wash);border-color:var(--amber);color:var(--amber)}
+.modehint{font-size:11.5px;line-height:1.65;color:var(--dim);margin:0;flex-basis:100%}
+
+/* ── 任務簡報 ── */
+.brief{background:var(--shell);border:1px solid var(--line);border-radius:12px;padding:15px 16px;
+  display:flex;flex-direction:column;gap:11px}
+.tag{font-family:var(--mono);font-size:10.5px;letter-spacing:.16em;color:var(--amber-dim);text-transform:uppercase}
+.client{font-size:14.5px;line-height:1.65;margin:0}
+.client .who{color:var(--dim)}
+.q{font-size:17px;font-weight:700;line-height:1.5;margin:0;color:#fff;text-wrap:balance;
+  border-left:3px solid var(--amber);padding-left:11px}
+
+/* ── 截獲文件 ── */
+.doc{background:var(--paper);color:var(--paper-ink);border-radius:12px;padding:18px 17px;
+  position:relative;box-shadow:0 10px 30px rgba(0,0,0,.45)}
+.doc::before{content:"INTERCEPTED";position:absolute;top:-8px;right:12px;font-family:var(--mono);
+  font-size:9px;letter-spacing:.2em;background:var(--amber);color:#2A1B05;padding:2px 7px;
+  border-radius:3px;font-weight:600}
+.z{cursor:pointer;border-radius:4px;padding:1px 3px;margin:0 -3px;border-bottom:1.5px dotted #B9B9B2;
+  transition:background .12s,box-shadow .12s;-webkit-tap-highlight-color:transparent}
+.z:hover{background:#EDEDE6}
+.z.sel{background:var(--amber-wash);box-shadow:0 0 0 2px var(--amber);border-bottom-color:transparent}
+.z.right{background:rgba(91,201,140,.2);box-shadow:0 0 0 2px var(--good);border-bottom-color:transparent}
+.z.wrong{background:rgba(255,116,82,.16);box-shadow:0 0 0 2px var(--bad);border-bottom-color:transparent}
+.doc.locked .z{cursor:default;pointer-events:none}
+
+.d-kicker{font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--paper-dim);
+  font-family:var(--mono);margin-bottom:6px}
+.d-title{font-size:20px;font-weight:800;line-height:1.25;margin:0 0 10px;font-family:var(--sans)}
+.d-row{display:flex;justify-content:space-between;gap:14px;padding:7px 0;border-top:1px solid var(--paper-line);
+  font-size:13.5px;align-items:baseline}
+.d-row .k{color:var(--paper-dim);flex-shrink:0}
+.d-row .v{text-align:right;font-weight:600}
+.d-fine{font-size:11.5px;color:var(--paper-dim);line-height:1.75;margin-top:11px}
+.d-list{margin:0;padding-left:16px;font-size:13.5px;line-height:2}
+.d-sec{font-family:var(--mono);font-size:10.5px;letter-spacing:.14em;color:var(--paper-dim);
+  margin:13px 0 4px;text-transform:uppercase}
+.d-price{font-size:26px;font-weight:800;letter-spacing:-.02em}
+.d-strike{text-decoration:line-through;color:var(--paper-dim);font-weight:500;font-size:15px}
+.d-badge{display:inline-block;background:#1B1F26;color:#fff;font-size:12px;font-weight:700;
+  padding:3px 9px;border-radius:4px;font-family:var(--mono)}
+.d-warn{background:#FFF4E0;border-left:3px solid #E0A020;padding:9px 11px;font-size:12.5px;
+  line-height:1.65;margin-top:11px;border-radius:0 5px 5px 0}
+.d-meta{font-size:12.5px;color:var(--paper-dim);margin-top:3px}
+.d-para{font-size:13.5px;line-height:2;margin:0}
+.lego{background:#D01012;color:#fff;font-weight:800;font-size:13px;letter-spacing:.06em;
+  padding:4px 9px;border-radius:5px;display:inline-block}
+.d-key{display:flex;justify-content:space-between;gap:14px;padding:8px 0;font-size:14px;
+  border-bottom:1px solid var(--paper-line);align-items:center}
+.d-key .cap{font-family:var(--mono);font-size:12px;background:#1B1F26;color:#fff;padding:3px 9px;
+  border-radius:4px;font-weight:600}
+.d-fore{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:9px 0;
+  border-bottom:1px solid var(--paper-line);font-size:14.5px}
+.d-fore .day{color:var(--paper-dim);width:32%}
+.d-fore .tmp{font-weight:700;font-variant-numeric:tabular-nums}
+.d-post{border-left:2px solid var(--paper-line);padding:6px 0 6px 11px;margin:9px 0;font-size:13px;
+  line-height:1.75}
+.d-post .au{font-family:var(--mono);font-size:10.5px;color:var(--paper-dim);display:block;margin-bottom:3px;
+  letter-spacing:.06em}
+.d-vote{font-family:var(--mono);font-size:10.5px;color:var(--paper-dim)}
+
+/* ── 控制列 ── */
+.ctrl{display:flex;gap:9px}
+button{font-family:var(--sans);font-size:14px;font-weight:700;border-radius:10px;padding:13px 14px;
+  border:1px solid var(--line);background:var(--shell2);color:var(--text);cursor:pointer;
+  transition:transform .1s,background .15s,opacity .15s;-webkit-tap-highlight-color:transparent}
+button:active{transform:translateY(1px)}
+button:disabled{opacity:.34;cursor:not-allowed}
+button:focus-visible{outline:2px solid var(--amber);outline-offset:2px}
+.send{flex:1;background:var(--amber);border-color:var(--amber);color:#2A1B05}
+.send:disabled{background:var(--shell2);border-color:var(--line);color:var(--dim)}
+.decode{font-family:var(--mono);font-size:12.5px;letter-spacing:.04em;flex-shrink:0}
+.ghost{background:none;border-color:var(--line);color:var(--dim);font-weight:500;font-size:13px}
+
+/* ── 判定 ── */
+.verdict{border-radius:12px;padding:15px 16px;display:flex;flex-direction:column;gap:9px;
+  border:1px solid var(--line);background:var(--shell)}
+.verdict.ok{border-color:rgba(91,201,140,.45);background:linear-gradient(var(--shell),rgba(91,201,140,.07))}
+.verdict.no{border-color:rgba(255,116,82,.4)}
+.v-head{font-family:var(--mono);font-size:11.5px;letter-spacing:.16em;text-transform:uppercase;
+  display:flex;gap:8px;align-items:center}
+.verdict.ok .v-head{color:var(--good)}
+.verdict.no .v-head{color:var(--bad)}
+.v-body{font-size:14.5px;line-height:1.7;margin:0}
+.v-body b{color:#fff}
+.gain{font-family:var(--mono);font-size:11px;color:var(--amber);letter-spacing:.1em}
+
+.decoded{background:#0B0F16;border:1px solid var(--amber-dim);border-radius:10px;padding:12px 14px;
+  display:flex;flex-direction:column;gap:7px}
+.decoded .tag{color:var(--amber)}
+.drow{display:flex;justify-content:space-between;gap:14px;font-size:13.5px;align-items:baseline}
+.drow .en{font-family:var(--mono);color:var(--amber);font-size:13px}
+.drow .zh{text-align:right}
+
+/* ── 口頭回報 ── */
+.voice{background:#0B0F16;border:1px solid var(--amber-dim);border-radius:12px;padding:14px 15px;
+  display:flex;flex-direction:column;gap:12px;margin-top:10px}
+.voice .tag{color:var(--amber)}
+.voice-note{margin:0;font-size:12.5px;line-height:1.7;color:var(--dim)}
+.voice-note strong{color:var(--amber)}
+.vrow{display:flex;flex-direction:column;gap:9px;padding-top:12px;border-top:1px solid var(--line)}
+.vtxt{font-family:var(--mono);font-size:15px;line-height:1.6;color:#fff}
+.vtxt .n{color:var(--amber-dim);font-size:11px;letter-spacing:.14em;display:block;margin-bottom:4px}
+.vbtns{display:flex;gap:7px;flex-wrap:wrap}
+.vbtns button{padding:10px 13px;font-size:12.5px;font-weight:600;flex:0 0 auto}
+.vlisten{border-color:var(--amber-dim);color:var(--amber)}
+.vdone{flex:1 1 auto;min-width:164px}
+.vdone.ok{background:rgba(91,201,140,.15);border-color:var(--good);color:var(--good)}
+.vrow.speaking .vtxt{color:var(--amber)}
+.vmic{flex:1 1 auto;min-width:130px;border-color:var(--amber-dim);color:var(--amber)}
+.vrow.hearing .vmic{background:rgba(255,116,82,.14);border-color:var(--bad);color:var(--bad)}
+.vres{display:flex;flex-direction:column;gap:6px;background:var(--shell);border-radius:9px;
+  padding:11px 12px;border:1px solid var(--line)}
+.vres.pass{border-color:rgba(91,201,140,.5)}
+.vres.fail{border-color:rgba(255,116,82,.42)}
+.vscore{display:flex;align-items:baseline;gap:9px;font-family:var(--mono)}
+.vscore .num{font-size:30px;font-weight:600;line-height:1;font-variant-numeric:tabular-nums}
+.vres.pass .num{color:var(--good)} .vres.fail .num{color:var(--bad)}
+.vscore .lab{font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--dim)}
+.vheard{font-size:12.5px;line-height:1.7;color:var(--dim)}
+.vheard i{font-style:normal;font-family:var(--mono);color:var(--text)}
+.vheard b{color:var(--bad);font-weight:600}
+.vadult{font-size:12px;font-weight:500;color:var(--dim);border-style:dashed}
+.meter{height:4px;border-radius:2px;background:var(--line);overflow:hidden}
+.meter span{display:block;height:100%;background:var(--bad);transition:width .4s ease}
+.vres.pass .meter span{background:var(--good)}
+.tally{font-family:var(--mono);font-size:11px;letter-spacing:.1em;color:var(--dim)}
+.final{background:var(--shell);border:1px solid var(--amber-dim);border-radius:14px;padding:26px 20px;
+  text-align:center;display:flex;flex-direction:column;gap:14px}
+.final h2{font-size:23px;margin:0;color:#fff}
+.score{font-family:var(--mono);font-size:46px;color:var(--amber);line-height:1;font-weight:600;
+  font-variant-numeric:tabular-nums}
+.final p{font-size:14px;line-height:1.75;color:var(--dim);margin:0}
+.next{border-top:1px solid var(--line);padding-top:15px;font-size:13.5px;line-height:1.8;
+  text-align:left;color:var(--text)}
+.next .tag{display:block;margin-bottom:7px}
+.foot{font-family:var(--mono);font-size:10px;letter-spacing:.14em;color:#4A5875;text-align:center;
+  text-transform:uppercase;padding-top:4px}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+
+<div class="wrap">
+  <div class="top">
+    <button class="brand" id="home"><span class="dot"></span>解碼局</button>
+    <span id="prog"></span>
+    <span class="cells" id="cells"></span>
+  </div>
+  <div id="stage"></div>
+  <div class="foot" id="foot">任務庫 · 三個賽程</div>
+</div>
+
+<script>
+/* ══ 賽程一：熱身（10 關，字很少） ══ */
+const WARMUP = [
+  {
+    code:"WIFI-GUEST", say:["password","Type in the password."],
+    client:'<span class="who">委託人：</span>店裡有免費 Wi-Fi，桌上放了這張卡。我手機連不上。',
+    q:"要連上網路，密碼那一格要打什麼？",
+    ans:"pw",
+    hint:"Network 是「網路名稱」，Password 才是「密碼」。你要的是 Password 那一行。",
+    payoff:"連上了。<b>Password</b> 那行才是密碼，coffee2026。網路名稱是另一回事。",
+    miss:"情報有誤。我把網路名稱當密碼打了五次，手機還跳出「密碼錯誤」。",
+    decode:[["Network","網路名稱"],["Password","密碼"],["Speed","速度"]],
+    doc:`<div class="d-kicker">Table card</div>
+      <h3 class="d-title" style="font-size:18px">Guest Wi-Fi</h3>
+      <div class="d-row"><span class="k">Network</span><span class="v"><span class="z" data-z="net">MakerCafe_5G</span></span></div>
+      <div class="d-row"><span class="k">Password</span><span class="v"><span class="z" data-z="pw">coffee2026</span></span></div>
+      <div class="d-row"><span class="k">Speed</span><span class="v"><span class="z" data-z="spd">up to 300 Mbps</span></span></div>`
+  },
+  {
+    code:"CTRL-SETUP", say:["jump","Press space to jump."],
+    client:'<span class="who">委託人：</span>這款遊戲我剛下載，介面全是英文。',
+    q:"要跳起來，該按哪一個鍵？",
+    ans:"jump",
+    hint:"Jump 就是「跳」。找到 Jump 那一行，看它右邊寫什麼鍵。",
+    payoff:"知道了。<b>Jump = Space</b>，空白鍵。我過第一關了。",
+    miss:"情報有誤。我一直按錯鍵，卡在第一個坑裡跳不過去。",
+    decode:[["Jump","跳躍"],["Sprint","衝刺"],["Move","移動"]],
+    doc:`<div class="d-kicker">Settings</div>
+      <h3 class="d-title" style="font-size:17px">Controls</h3>
+      <div class="d-key"><span class="z" data-z="move">Move</span><span class="cap">W A S D</span></div>
+      <div class="d-key"><span class="z" data-z="jump">Jump</span><span class="cap">Space</span></div>
+      <div class="d-key"><span class="z" data-z="sprint">Sprint</span><span class="cap">Shift</span></div>
+      <div class="d-key" style="border-bottom:none"><span class="z" data-z="map">Map</span><span class="cap">M</span></div>`
+  },
+  {
+    code:"SNACK-120G", say:["contains","It contains peanuts."],
+    client:'<span class="who">委託人：</span>我買了這包餅乾。可是表弟對花生過敏，很嚴重。',
+    q:"這包餅乾，表弟能不能吃？",
+    ans:"contains",
+    hint:"Contains 的意思是「裡面有」。那一行列了三樣東西——其中一個是 peanuts，花生。",
+    payoff:"太好了你有看。<b>Contains: peanuts</b>＝裡面有花生。我把這包收起來，另外買了一包給他。",
+    miss:"情報有誤。他吃了兩口就開始起紅疹，我們趕去了診所。",
+    decode:[["Contains","內含、裡面有"],["peanuts","花生"],["Best before","保存期限"]],
+    doc:`<div class="d-kicker">Snack packaging</div>
+      <h3 class="d-title" style="font-size:18px"><span class="z" data-z="name">Crunchy Choco Bites</span></h3>
+      <div class="d-row"><span class="k">Weight</span><span class="v"><span class="z" data-z="net">Net weight 120 g</span></span></div>
+      <div class="d-row"><span class="k">Allergens</span><span class="v"><span class="z" data-z="contains">Contains: milk, wheat, peanuts</span></span></div>
+      <div class="d-row"><span class="k">Date</span><span class="v"><span class="z" data-z="bb">Best before: 09 / 2027</span></span></div>`
+  },
+  {
+    code:"WX-TPE", say:["tomorrow","It will rain tomorrow."],
+    client:'<span class="who">委託人：</span>明天要去動物園。我在想要不要帶傘。',
+    q:"明天的天氣怎樣？要帶傘嗎？",
+    ans:"tmr",
+    hint:"Today 是今天，Tomorrow 是明天。看 Tomorrow 那一行寫什麼天氣——Rain 是「雨」。",
+    payoff:"傘帶了。<b>Tomorrow — Rain</b>，明天下雨。我們改去室內的科教館，沒淋到。",
+    miss:"情報有誤。我們在動物園門口被雨淋成落水狗。",
+    decode:[["Tomorrow","明天"],["Rain","雨"],["Sunny","晴天"]],
+    doc:`<div class="d-kicker">Weather</div>
+      <h3 class="d-title" style="font-size:18px">Taipei</h3>
+      <div class="d-fore"><span class="day"><span class="z" data-z="today">Today</span></span><span class="tmp">28°</span><span>Sunny</span></div>
+      <div class="d-fore"><span class="day"><span class="z" data-z="tmr">Tomorrow</span></span><span class="tmp">22°</span><span>Rain</span></div>
+      <div class="d-fore" style="border-bottom:none"><span class="day"><span class="z" data-z="sat">Saturday</span></span><span class="tmp">25°</span><span>Cloudy</span></div>`
+  },
+  {
+    code:"PARTY-LEO", say:["swimwear","Bring your swimwear."],
+    client:'<span class="who">委託人：</span>你同學 Leo 的生日派對邀請卡。這週六。',
+    q:"去之前，要準備什麼帶去？",
+    ans:"bring",
+    hint:"Bring 的意思是「帶…來」。找 Bring 開頭那一行——swimwear 跟游泳有關。",
+    payoff:"泳衣帶了。<b>Bring swimwear</b>＝要帶泳衣，那邊有泳池。現場有一半的小孩忘了帶，只能坐在旁邊看。",
+    miss:"情報有誤。你什麼都沒帶，全場只有你不能下水。",
+    decode:[["Bring","帶…來"],["swimwear","泳衣"],["RSVP by","請在…前回覆"]],
+    doc:`<div class="d-kicker">Invitation</div>
+      <h3 class="d-title" style="font-size:19px">You're invited!</h3>
+      <div class="d-row"><span class="k">Occasion</span><span class="v"><span class="z" data-z="who">Leo's 10th Birthday</span></span></div>
+      <div class="d-row"><span class="k">When</span><span class="v"><span class="z" data-z="when">Sat 12 July, 2:00 PM</span></span></div>
+      <div class="d-row"><span class="k">Where</span><span class="v"><span class="z" data-z="where">Riverside Park</span></span></div>
+      <div class="d-warn"><span class="z" data-z="bring">Bring swimwear — we're using the pool!</span></div>
+      <div class="d-fine"><span class="z" data-z="rsvp">RSVP by 8 July.</span></div>`
+  },
+  {
+    code:"POOL-RULES", say:["no diving","No diving in the shallow end."],
+    client:'<span class="who">委託人：</span>泳池邊立了一塊告示牌。你說你想從這邊跳下去。',
+    q:"這一區可以跳水嗎？",
+    ans:"dive",
+    hint:"No 開頭的那幾行都是「不可以」。diving 是「跳水」，shallow 是「淺」。",
+    payoff:"還好你先看了。<b>No diving in the shallow end</b>＝淺水區禁止跳水，那邊只有 90 公分深。我們走到深水區那頭去跳。",
+    miss:"情報有誤。你跳下去撞到池底，額頭腫了一個包，救生員吹哨把你叫上來。",
+    decode:[["No diving","禁止跳水"],["shallow end","淺水區"],["adult","大人"]],
+    doc:`<div class="d-kicker">Poolside sign</div>
+      <h3 class="d-title" style="font-size:18px">Pool Rules</h3>
+      <div class="d-fine" style="font-size:13.5px;color:var(--paper-ink);line-height:2.1">
+        <span class="z" data-z="dive">No diving in the shallow end.</span><br>
+        <span class="z" data-z="u12">Children under 12 must be with an adult.</span><br>
+        <span class="z" data-z="shower">Showers before swimming.</span><br>
+        <span class="z" data-z="close">Pool closes at 6:00 PM.</span>
+      </div>`
+  },
+  {
+    code:"MUSEUM-ENT", say:["free entry","Free entry for kids under twelve."],
+    client:'<span class="who">委託人：</span>我們到科學博物館門口了。我正要去買票。你 10 歲。',
+    q:"你要不要付門票錢？",
+    ans:"free",
+    hint:"Free 是「免費」。under 12 是「未滿 12 歲」。你 10 歲，比 12 小還是大？",
+    payoff:"你免費進去的。<b>Free entry under 12</b>——我本來要掏 500，結果只付了自己那一份。",
+    miss:"情報有誤。我在售票口多買了一張票，進去以後才看到牌子，錢退不回來了。",
+    decode:[["Free entry","免費入場"],["under 12","未滿 12 歲"],["Adults","大人"]],
+    doc:`<div class="d-kicker">Entrance notice</div>
+      <h3 class="d-title" style="font-size:18px">Science Museum</h3>
+      <div class="d-row"><span class="k">Hours</span><span class="v"><span class="z" data-z="hours">9:00 — 17:00</span></span></div>
+      <div class="d-row"><span class="k">Children</span><span class="v"><span class="z" data-z="free">Free entry under 12</span></span></div>
+      <div class="d-row"><span class="k">Adults</span><span class="v"><span class="z" data-z="adult">NT$250</span></span></div>
+      <div class="d-fine"><span class="z" data-z="photo">No flash photography.</span></div>`
+  },
+  {
+    code:"SHOP-HOURS", say:["closed","The shop is closed on Mondays."],
+    client:'<span class="who">委託人：</span>星期一放假，我想去這家店寫作業，那邊有 Wi-Fi。',
+    q:"星期一去，這家店開著嗎？",
+    ans:"closed",
+    hint:"別只看營業時間那行。Closed 的意思是「關門」——它後面接的是哪一天？",
+    payoff:"省了一趟。<b>Closed on Mondays</b>＝星期一公休。我們改星期二去，位子還很空。",
+    miss:"情報有誤。我們騎了 20 分鐘過去，門上掛著一塊木牌，店是暗的。",
+    decode:[["Closed","關門、公休"],["Mondays","星期一"],["Open","營業"]],
+    doc:`<div class="d-kicker">Shop front</div>
+      <h3 class="d-title" style="font-size:18px">Maker's Coffee</h3>
+      <div class="d-row"><span class="k">Hours</span><span class="v"><span class="z" data-z="open">Open 8:00 — 20:00</span></span></div>
+      <div class="d-row"><span class="k">Rest day</span><span class="v"><span class="z" data-z="closed">Closed on Mondays</span></span></div>
+      <div class="d-row"><span class="k">Extras</span><span class="v"><span class="z" data-z="wifi">Free Wi-Fi</span></span></div>`
+  },
+  {
+    code:"BOARDING-BR226", say:["gate","Find the boarding gate."],
+    client:'<span class="who">委託人：</span>機場好大，廣播全是英文。我們要去哪裡等？',
+    q:"要走到哪一個門去等飛機？",
+    ans:"gate",
+    hint:"Seat 是「座位」，那是上了飛機才用的。Gate 才是「登機門」。",
+    payoff:"<b>Gate B12</b>。Gate 才是登機門，Seat 32K 是上飛機以後的位子。我們走對邊了。",
+    miss:"情報有誤。我們跑去 32 號閘口，那裡正在登機的是飛大阪的班機。",
+    decode:[["Gate","登機門"],["Seat","座位"],["Boarding","開始登機"]],
+    doc:`<div class="d-kicker">Boarding pass</div>
+      <h3 class="d-title" style="font-size:17px">Flight BR226</h3>
+      <div class="d-row"><span class="k">Passenger</span><span class="v"><span class="z" data-z="name">LIN / WEI</span></span></div>
+      <div class="d-row"><span class="k">Seat</span><span class="v"><span class="z" data-z="seat">32K</span></span></div>
+      <div class="d-row"><span class="k">Gate</span><span class="v"><span class="z" data-z="gate">B12</span></span></div>
+      <div class="d-row"><span class="k">Boarding</span><span class="v"><span class="z" data-z="board">14:05</span></span></div>
+      <div class="d-row"><span class="k">Departs</span><span class="v"><span class="z" data-z="dep">14:35</span></span></div>`
+  },
+  {
+    code:"SRV-MAINT", say:["maintenance","The servers are offline tonight."],
+    client:'<span class="who">委託人：</span>你說今天晚上 11 點半要上線跟同學打。官網貼了這則公告。',
+    q:"晚上 11 點半，上得去嗎？",
+    ans:"window",
+    hint:"maintenance 是「維護」。看那段時間是幾點到幾點——23:00 就是晚上 11 點。",
+    payoff:"上不去。<b>23:00 — 02:00</b> 是維護時間，offline＝伺服器關著。你早點睡，明天一早再打。",
+    miss:"情報有誤。你 11 點半開電腦，卡在連線畫面等了一個小時。",
+    decode:[["maintenance","維護"],["offline","離線、關閉"],["Log in","登入"]],
+    doc:`<div class="d-kicker">Server status</div>
+      <h3 class="d-title" style="font-size:18px">Scheduled Maintenance</h3>
+      <div class="d-warn"><span class="z" data-z="window">Tonight 23:00 — 02:00</span></div>
+      <div class="d-fine" style="font-size:13px;color:var(--paper-ink);line-height:2">
+        <span class="z" data-z="off">Servers will be offline during this time.</span><br>
+        <span class="z" data-z="again">Log in again after 02:00.</span>
+      </div>`
+  }
+];
+
+/* ══ 賽程二：標準（8 關，與第一級版本相同） ══ */
+const STANDARD = [
+  {
+    code:"LEGO-60411", say:["ages","This set is for ages eight plus."],
+    client:'<span class="who">委託人：</span>阿姨下週生日，我想買這盒給她 6 歲的兒子。',
+    q:"這盒樂高，6 歲的小孩可以玩嗎？",
+    ans:"age",
+    hint:"盒子上有一個地方直接寫了「幾歲以上」。Ages 是「年紀」的意思。",
+    payoff:"情報確認。<b>Ages 8+</b> 是「8 歲以上」——6 歲太小了。我改買 CITY 系列 4+ 那盒，他自己就拆得開。",
+    miss:"情報有誤。我照你說的買了，結果他拼到一半就哭著說太難。",
+    decode:[["Ages 8+","適合 8 歲以上"],["pieces","零件數"],["Item","商品編號"]],
+    doc:`<div class="lego">LEGO</div>
+      <div class="d-kicker" style="margin-top:12px">City · Fire Series</div>
+      <h3 class="d-title"><span class="z" data-z="name">Fire Rescue Helicopter</span></h3>
+      <div class="d-row"><span class="k">Age</span><span class="v"><span class="z" data-z="age">Ages 8+</span></span></div>
+      <div class="d-row"><span class="k">Contents</span><span class="v"><span class="z" data-z="pcs">540 pieces</span></span></div>
+      <div class="d-row"><span class="k">Product</span><span class="v"><span class="z" data-z="item">Item 60411</span></span></div>
+      <div class="d-row"><span class="k">Minifigures</span><span class="v"><span class="z" data-z="fig">4 included</span></span></div>`
+  },
+  {
+    code:"BOX-REAR", say:["not included","Batteries are not included."],
+    client:'<span class="who">委託人：</span>這台玩具車今天下午就要送去party，拆開應該馬上能玩吧？',
+    q:"買回來當場就能玩嗎？還缺什麼？",
+    ans:"batt",
+    hint:"答案藏在最下面的小字裡。included 是「已附上」的意思，那 not included 呢？",
+    payoff:"幸好你看到了。<b>not included</b>＝沒有附。我在路上先去買了 2 顆 AA 電池，一到現場就能開。",
+    miss:"情報有誤。到現場才發現不會動，車子在桌上躺了一整個下午。",
+    decode:[["not included","沒有附、不含"],["Requires","需要"],["Assembled","組裝完成後"]],
+    doc:`<div class="d-kicker">Package back · small print</div>
+      <h3 class="d-title" style="font-size:16px">TURBO RACER — RC Stunt Car</h3>
+      <div class="d-fine" style="font-size:13px;color:var(--paper-ink);line-height:2">
+        <span class="z" data-z="warn">WARNING: CHOKING HAZARD — small parts.</span><br>
+        <span class="z" data-z="u3">Not for children under 3 years.</span><br>
+        <span class="z" data-z="batt">Requires 2 x AA batteries (not included).</span><br>
+        <span class="z" data-z="size">Assembled size: 25 cm x 14 cm.</span><br>
+        <span class="z" data-z="made">Made in Denmark.</span>
+      </div>`
+  },
+  {
+    code:"STORE-SALE", say:["sale ends","The sale ends on Sunday."],
+    client:'<span class="who">委託人：</span>這款遊戲在特價。我這週末沒空，想星期一再買。',
+    q:"星期一還買得到這個價格嗎？",
+    ans:"ends",
+    hint:"找 ends 這個字——它的意思是「結束」。後面接的是哪一天？",
+    payoff:"來得及。<b>Sunday</b> 是星期天，特價星期天早上就結束了。我昨晚先刷下去，省了 24 美金。",
+    miss:"情報有誤。星期一打開來看，價錢已經跳回 $39.99 了。",
+    decode:[["Sale ends","特價結束於"],["Sunday","星期日"],["Platforms","可玩的機種"]],
+    doc:`<div class="d-kicker">Game Store</div>
+      <h3 class="d-title"><span class="z" data-z="name">SKY RAIDERS: Deluxe Edition</span></h3>
+      <div style="display:flex;align-items:baseline;gap:10px;margin-bottom:6px">
+        <span class="d-badge">-60%</span>
+        <span class="d-strike"><span class="z" data-z="old">$39.99</span></span>
+        <span class="d-price"><span class="z" data-z="new">$15.99</span></span>
+      </div>
+      <div class="d-warn"><span class="z" data-z="ends">Sale ends Sunday, 3 May at 10:00 AM.</span></div>
+      <div class="d-row" style="margin-top:10px"><span class="k">Platforms</span><span class="v"><span class="z" data-z="plat">PC, PS5, Xbox</span></span></div>
+      <div class="d-row"><span class="k">Modes</span><span class="v"><span class="z" data-z="mode">Single-player, Online Co-op</span></span></div>`
+  },
+  {
+    code:"EBAY-PKM", say:["shipping","Shipping costs extra."],
+    client:'<span class="who">委託人：</span>我看到這張卡了，$42 我付得起。就這樣下訂囉？',
+    q:"除了卡片本身的錢，還要多付多少？",
+    ans:"ship",
+    hint:"東西從國外寄過來，不會是免費的。找 Shipping 這個字。",
+    payoff:"還好有問你。<b>Shipping $18.50</b> 是運費——實際要付 $60.50，不是 $42。我先去比了別家。",
+    miss:"情報有誤。結帳的時候金額突然變多，錢不夠，訂單掛掉了。",
+    decode:[["Shipping","運費"],["available","還有幾個可賣"],["Returns","退貨"]],
+    doc:`<div class="d-kicker">Auction listing</div>
+      <h3 class="d-title" style="font-size:17px"><span class="z" data-z="name">Pokémon Charizard VMAX — Rainbow Rare</span></h3>
+      <div class="d-price" style="margin-bottom:8px"><span class="z" data-z="price">US $42.00</span></div>
+      <div class="d-row"><span class="k">Shipping</span><span class="v"><span class="z" data-z="ship">US $18.50 to Taiwan</span></span></div>
+      <div class="d-row"><span class="k">Delivery</span><span class="v"><span class="z" data-z="eta">Est. 15–24 Jun</span></span></div>
+      <div class="d-row"><span class="k">Stock</span><span class="v"><span class="z" data-z="stock">3 available / 12 sold</span></span></div>
+      <div class="d-fine"><span class="z" data-z="ret">Returns: seller does not accept returns.</span></div>`
+  },
+  {
+    code:"PATCH-2.4.1", say:["reduced","The damage was reduced."],
+    client:'<span class="who">委託人：</span>改版了。我主力是冰霜弓，牠有被動到嗎？',
+    q:"冰霜弓（Frost Bow）變強還是變弱了？",
+    ans:"bow",
+    hint:"reduced 的意思是「降低」，increased 是「提高」。Frost Bow 那行是哪一個？",
+    payoff:"果然。傷害從 45 砍到 32，<b>reduced</b>＝變弱了。我今晚先改練別把武器，不浪費時間。",
+    miss:"情報有誤。我開開心心上線，結果一場都打不贏。",
+    decode:[["reduced","降低、變弱"],["increased","提高、變長"],["unchanged","沒有改動"]],
+    doc:`<div class="d-kicker">Official patch notes</div>
+      <h3 class="d-title" style="font-size:18px">Update v2.4.1</h3>
+      <div class="d-sec">Balance</div>
+      <ul class="d-list">
+        <li><span class="z" data-z="bow">Frost Bow damage reduced from 45 to 32</span></li>
+        <li><span class="z" data-z="potion">Healing Potion cooldown increased to 20s</span></li>
+        <li><span class="z" data-z="cloak">Shadow Cloak duration unchanged</span></li>
+      </ul>
+      <div class="d-sec">New</div>
+      <ul class="d-list"><li><span class="z" data-z="map">Added Desert Arena map</span></li></ul>
+      <div class="d-sec">Fixes</div>
+      <ul class="d-list"><li><span class="z" data-z="fix">Fixed crash when entering the Vault</span></li></ul>`
+  },
+  {
+    code:"LIMIT-SW2", say:["limit","Limit two per customer."],
+    client:'<span class="who">委託人：</span>這台超划算。我想一次買 5 台，自己留一台其他送人。',
+    q:"一個人可以買 5 台嗎？",
+    ans:"limit",
+    hint:"Limit 的意思是「上限」。per customer 是「每位客人」。",
+    payoff:"擋下來了。<b>Limit 2 per customer</b>＝一人最多 2 台。我分兩次下單，沒被系統取消。",
+    miss:"情報有誤。訂單送出後被賣家自動取消，還要等 7 天退款。",
+    decode:[["Limit","上限"],["per customer","每位客人"],["In stock","有現貨"]],
+    doc:`<div class="d-kicker">Online store</div>
+      <h3 class="d-title"><span class="z" data-z="name">Handheld Console — Starter Bundle</span></h3>
+      <div class="d-price" style="margin-bottom:8px"><span class="z" data-z="price">$449.99</span></div>
+      <div class="d-row"><span class="k">Availability</span><span class="v"><span class="z" data-z="stock">In stock — ships in 24 hours</span></span></div>
+      <div class="d-row"><span class="k">Shipping</span><span class="v"><span class="z" data-z="ship">Free over $50</span></span></div>
+      <div class="d-warn"><span class="z" data-z="limit">Limit 2 per customer.</span></div>`
+  },
+  {
+    code:"TICKET-RX26", say:["doors open","The doors open at nine thirty."],
+    client:'<span class="who">委託人：</span>機器人展的票拿到了。我們幾點出門？想早點進去卡位。',
+    q:"最早幾點可以進場？",
+    ans:"doors",
+    hint:"表演開始的時間，跟開門讓人進去的時間，不是同一個。Doors 是「門」。",
+    payoff:"漂亮。<b>Doors open 9:30</b>＝9 點半就開門，表演 11 點才開始。我們 9 點到，排在前面。",
+    miss:"情報有誤。我們 11 點才到，好位子全被坐滿了。",
+    decode:[["Doors open","開放入場"],["Show starts","表演開始"],["entry","入場"]],
+    doc:`<div class="d-kicker">Admission ticket</div>
+      <h3 class="d-title"><span class="z" data-z="name">ROBOT EXPO 2026</span></h3>
+      <div class="d-row"><span class="k">Date</span><span class="v"><span class="z" data-z="date">Sat 18 Apr</span></span></div>
+      <div class="d-row"><span class="k">Doors</span><span class="v"><span class="z" data-z="doors">Doors open 9:30 AM</span></span></div>
+      <div class="d-row"><span class="k">Show</span><span class="v"><span class="z" data-z="show">Show starts 11:00 AM</span></span></div>
+      <div class="d-row"><span class="k">Venue</span><span class="v"><span class="z" data-z="hall">Hall 3, Taipei</span></span></div>
+      <div class="d-fine"><span class="z" data-z="id">Ticket holders must show ID at entry.</span></div>`
+  },
+  {
+    code:"TUTORIAL-MC", say:["may not work","It may not work in newer versions."],
+    client:'<span class="who">委託人：</span>找到電梯教學了，讚數超高。我照著做就對了吧？',
+    q:"這個教學，現在照做還會成功嗎？",
+    ans:"ver",
+    hint:"影片作者自己留了一句警告。may not work 的意思是「可能不能用」——用在什麼情況？",
+    payoff:"救了我兩小時。作者寫 <b>may not work in newer versions</b>——那是 1.16 的做法，我現在是 1.21。我去找新版的教學了。",
+    miss:"情報有誤。我照著蓋了兩個小時，紅石完全沒反應。",
+    decode:[["may not work","可能不能用"],["newer versions","比較新的版本"],["views","觀看次數"]],
+    doc:`<div class="d-kicker">Video page</div>
+      <h3 class="d-title" style="font-size:17px"><span class="z" data-z="title">How to Build a Working Elevator in Minecraft</span></h3>
+      <div class="d-meta"><span class="z" data-z="views">1.2M views</span> · <span class="z" data-z="when">3 years ago</span></div>
+      <div class="d-row" style="margin-top:10px"><span class="k">Channel</span><span class="v"><span class="z" data-z="sub">840K subscribers</span></span></div>
+      <div class="d-warn"><span class="z" data-z="ver">Works in Java Edition 1.16 — may not work in newer versions.</span></div>`
+  }
+];
+
+/* ══ 賽程三：深層（3 關，整段英文、答案藏在條件裡） ══ */
+const ADVANCED = [
+  {
+    code:"FORUM-IRON", say:["break and replace","Break and replace the beds."],
+    client:'<span class="who">委託人：</span>我的鐵傀儡農場改版後壞了。論壇上有人問了一樣的問題，下面四個人回覆。我該照誰說的做？',
+    q:"哪一則回覆真的告訴你「該怎麼修」？",
+    ans:"r2",
+    hint:"有兩個人只是說「我也一樣」，有一個人怪你的電腦。只有一則說出了「要動哪個東西」——而且它的票數最高。",
+    payoff:"照第二則做了。<b>break and replace the beds</b>＝把床敲掉重放，不用拆整座農場。20 分鐘就修好了。",
+    miss:"情報有誤。我把整座農場拆了重蓋，花了一整個週末，結果還是不會動。",
+    decode:[["break and replace","敲掉重放"],["linking","綁定、連結"],["rebuild","整個重蓋"]],
+    doc:`<div class="d-kicker">r/MinecraftHelp · 4 replies</div>
+      <h3 class="d-title" style="font-size:15.5px">My iron farm stopped working after the update. Any fix?</h3>
+      <div class="d-meta" style="margin-bottom:4px">Posted by blockhead_92 · 4 hours ago</div>
+      <div class="d-post"><span class="au">steve_builds · <span class="d-vote">2 votes</span></span>
+        <span class="z" data-z="r1">Just rebuild the whole thing. Mine broke too, that's what I did.</span></div>
+      <div class="d-post"><span class="au">redstone_kate · <span class="d-vote">47 votes</span></span>
+        <span class="z" data-z="r2">The update changed how villagers link to beds. You need to break and replace the beds — not the whole farm.</span></div>
+      <div class="d-post"><span class="au">mc_fan2013 · <span class="d-vote">0 votes</span></span>
+        <span class="z" data-z="r3">same problem here!!! did anyone fix it yet</span></div>
+      <div class="d-post" style="margin-bottom:0"><span class="au">nether_nick · <span class="d-vote">5 votes</span></span>
+        <span class="z" data-z="r4">Works fine on my server. Must be something wrong with your computer.</span></div>`
+  },
+  {
+    code:"POLICY-RTN", say:["store credit","Opened items get store credit only."],
+    client:'<span class="who">委託人：</span>耳機我已經拆開試聽過了，音質不喜歡。我想退錢，可以嗎？',
+    q:"東西已經拆封了。退得回現金嗎？還是只能換別的？",
+    ans:"opened",
+    hint:"第一句講的是「沒拆封」的情況，跟你不一樣。找 Opened 開頭那一句——store credit 是「只能在這家店折抵的點數」，不是現金。",
+    payoff:"清楚了。拆封過的只能換 <b>store credit</b>，退不到現金。我不換了，直接掛二手賣掉。",
+    miss:"情報有誤。我跑了一趟門市，店員指著條款念給我聽，我只能空手回家。",
+    decode:[["provided","前提是、只要"],["unopened","未拆封的"],["store credit","店內折抵金"]],
+    doc:`<div class="d-kicker">Returns &amp; refunds policy</div>
+      <h3 class="d-title" style="font-size:16px">Section 4 — Returns</h3>
+      <p class="d-para">
+        <span class="z" data-z="r30">Returns are accepted within 30 days of delivery, provided the item is unopened and in its original packaging.</span><br>
+        <span class="z" data-z="opened">Opened items may be exchanged for store credit only.</span><br>
+        <span class="z" data-z="ship">Shipping costs are non-refundable.</span><br>
+        <span class="z" data-z="sale">Sale items are final and cannot be returned.</span>
+      </p>`
+  },
+  {
+    code:"ENTRY-JRC26", say:["parental consent","I need a parental consent form."],
+    client:'<span class="who">委託人：</span>你 11 歲，想報名這個機器人比賽。我把報名頁印出來給你。',
+    q:"你 11 歲。除了填表格，你還需要誰做一件事？",
+    ans:"consent",
+    hint:"你 11 歲，比 13 小。找有 under 13 的那一句——parental 跟「父母」有關，consent 是「同意」。",
+    payoff:"看懂了。<b>under 13 要家長簽同意書</b>。我先把那張表印出來給爸爸簽，才送得出去。順便注意到不能單人報名，我去找同學組隊。",
+    miss:"情報有誤。表格送出後被退回，說文件不齊，等我補件時報名已經截止了。",
+    decode:[["parental consent","家長同意"],["Eligibility","參加資格"],["Solo entries","單人報名"]],
+    doc:`<div class="d-kicker">Registration · 2026</div>
+      <h3 class="d-title" style="font-size:17px">Junior Robotics Challenge</h3>
+      <div class="d-warn"><span class="z" data-z="close">Registration closes 12 March, 23:59.</span></div>
+      <div class="d-sec">Eligibility</div>
+      <p class="d-para">
+        <span class="z" data-z="age">Open to students aged 9–15.</span><br>
+        <span class="z" data-z="consent">Participants under 13 must submit a signed parental consent form.</span><br>
+        <span class="z" data-z="solo">Teams of 2–4. Solo entries are not accepted.</span>
+      </p>
+      <div class="d-row" style="margin-top:8px"><span class="k">Entry fee</span><span class="v"><span class="z" data-z="fee">Free</span></span></div>`
+  }
+];
+
+const TIERS = [
+  { id:"warmup", name:"熱身賽程", bars:1, decoders:6, tasks:WARMUP,
+    desc:"字很少，一眼就看得完。先確認一件事：你做得到。",
+    grades:["還在暖身","進入狀況","節奏穩了","輕鬆完賽"],
+    close:"這一段的英文，你其實本來就看得懂——只是以前沒人叫你去看。<br><br>準備好了就跑下一個賽程。那邊的文件字會變多，但方法完全一樣：<strong style=\"color:var(--amber)\">找那句會改變決定的話。</strong>" },
+  { id:"standard", name:"標準賽程", bars:2, decoders:5, tasks:STANDARD,
+    desc:"真實的商品頁、樂高盒、改版公告、票券。有陷阱。",
+    grades:["實習生","見習情報員","二級情報員","一級情報員"],
+    close:"你剛剛做的事情，沒有一件是「背單字」。你是在一堆英文裡面，找出那句會改變決定的話。<br><br>最後一個賽程的文件，答案不會單獨躺在一行上——它藏在「如果…就…」裡面。" },
+  { id:"advanced", name:"深層賽程", bars:3, decoders:3, tasks:ADVANCED,
+    desc:"整段英文，沒有圖。答案藏在條件句裡，還有人會給你錯的建議。",
+    grades:["需要複訓","勉強及格","深層解讀員","首席解讀員"],
+    close:"這三份文件，大人也常常看錯。<br><br>接下來換真的：家裡真的要買的東西、真的要查的規則、你自己想加入的國外社群，<strong style=\"color:var(--amber)\">由你來讀。</strong>那不是遊戲的下一關，那是遊戲的目的。" }
+];
+
+const KEY = "decoder-vault-v1";
+let S = { tier:null, i:0, decoders:0, score:0, tries:0, revealed:false, sel:null, spoken:0, marks:[], micMode:false, best:{} };
+
+function load(){ try{ const r=localStorage.getItem(KEY); if(r) S=Object.assign(S,JSON.parse(r)); }catch(e){} }
+function save(){ try{ localStorage.setItem(KEY,JSON.stringify(S)); }catch(e){} }
+const tier = ()=>TIERS.find(t=>t.id===S.tier);
+const stage = document.getElementById("stage");
+const el = (h)=>{ const d=document.createElement("div"); d.innerHTML=h.trim(); return d.firstElementChild; };
+const bars = (n)=>`<span class="bars">${[1,2,3].map(i=>`<span class="bar${i<=n?" on":""}"></span>`).join("")}</span>`;
+
+function renderTop(){
+  const t=tier();
+  document.getElementById("prog").textContent = !t ? "待命"
+    : S.i>=t.tasks.length ? "賽程完成"
+    : "任務 "+String(S.i+1).padStart(2,"0")+" / "+String(t.tasks.length).padStart(2,"0");
+  const c=document.getElementById("cells"); c.innerHTML="";
+  if(!t) return;
+  for(let n=0;n<t.decoders;n++){
+    const s=document.createElement("span");
+    s.className="cell"+(n<S.decoders?"":" off"); c.appendChild(s);
+  }
+}
+
+function renderMenu(){
+  S.tier=null; renderTop();
+  document.getElementById("foot").textContent="任務庫 · 三個賽程";
+  stage.innerHTML="";
+  stage.appendChild(el(`<div class="menu-head">
+      <h1>選一個賽程</h1>
+      <p>每一份文件都是真的英文。你的工作有兩件：在裡面點出那句會改變決定的話，然後<strong style="color:var(--amber)">對著麥克風把它唸出來</strong>——發音要拿到 88 分才算回報成功。</p>
+    </div>`));
+  const list=el(`<div class="bands"></div>`);
+  TIERS.forEach(t=>{
+    const b=S.best[t.id], max=t.tasks.length*3;
+    const b_ = el(`<button class="band">
+        <span class="band-top"><span class="band-name">${t.name}</span>${bars(t.bars)}</span>
+        <p class="band-desc">${t.desc}</p>
+        <span class="band-foot">
+          <span>${t.tasks.length} 個任務</span>
+          <span>解碼器 ${t.decoders}</span>
+          <span class="${b?"done":""}">${b?`最佳 ${b}/${max}`:"未執行"}</span>
+        </span>
+      </button>`);
+    b_.addEventListener("click",()=>startTier(t.id));
+    list.appendChild(b_);
+  });
+  stage.appendChild(list);
+
+  const mode=el(`<div class="modebar">
+      <span class="lab">驗收方式</span>
+      <button id="m-mom" class="${!S.micMode?"on":""}">媽媽聽</button>
+      <button id="m-mic" class="${S.micMode?"on":""}" ${CAN_HEAR?"":"disabled"}>麥克風 ${PASS_MARK} 分</button>
+      <p class="modehint">${CAN_HEAR
+        ? (S.micMode
+            ? `唸完由程式打分，${PASS_MARK} 分才過。第一次會問你要不要開麥克風，要按「允許」。`
+            : "唸給媽媽聽，她聽過了才按通過。想讓程式打分就切到右邊。")
+        : "這個瀏覽器不支援麥克風辨識（換 Chrome 或 Safari 才有），現在只能用媽媽驗收。"}</p>
+    </div>`);
+  stage.appendChild(mode);
+  mode.querySelector("#m-mom").addEventListener("click",()=>{ S.micMode=false; micBlocked=false; save(); renderMenu(); });
+  mode.querySelector("#m-mic").addEventListener("click",()=>{ if(!CAN_HEAR)return; S.micMode=true; micBlocked=false; save(); renderMenu(); });
+  save();
+}
+
+function startTier(id){
+  const t=TIERS.find(x=>x.id===id);
+  S.tier=id; S.i=0; S.score=0; S.tries=0; S.revealed=false; S.sel=null; S.spoken=0; S.marks=[]; S.decoders=t.decoders;
+  save(); render(); window.scrollTo(0,0);
+}
+
+function render(){
+  const t=tier();
+  if(!t){ renderMenu(); return; }
+  document.getElementById("foot").textContent=t.name;
+  renderTop();
+  stage.innerHTML="";
+  if(S.i>=t.tasks.length){ renderFinal(t); return; }
+  const k=t.tasks[S.i];
+
+  stage.appendChild(el(`<div class="brief">
+      <div class="tag">檔案 ${k.code}</div>
+      <p class="client">${k.client}</p>
+      <p class="q">${k.q}</p>
+    </div>`));
+
+  const doc = el(`<div class="doc">${k.doc}</div>`);
+  stage.appendChild(doc);
+
+  const decoded = el(`<div class="decoded" hidden><div class="tag">解碼器輸出</div>${
+    k.decode.map(d=>`<div class="drow"><span class="en">${d[0]}</span><span class="zh">${d[1]}</span></div>`).join("")
+  }</div>`);
+  stage.appendChild(decoded);
+  if(S.revealed) decoded.hidden=false;
+
+  const ctrl = el(`<div class="ctrl">
+      <button class="decode" id="btnDec">解碼器 ${S.decoders}</button>
+      <button class="send" id="btnSend" disabled>送出情報</button>
+    </div>`);
+  stage.appendChild(ctrl);
+  const slot = el(`<div id="vslot"></div>`);
+  stage.appendChild(slot);
+
+  const zones=[...doc.querySelectorAll(".z")];
+  zones.forEach(z=>z.addEventListener("click",()=>{
+    zones.forEach(o=>o.classList.remove("sel"));
+    z.classList.add("sel"); S.sel=z.dataset.z;
+    document.getElementById("btnSend").disabled=false;
+  }));
+
+  const btnDec=document.getElementById("btnDec");
+  if(S.decoders<=0 || S.revealed) btnDec.disabled=true;
+  btnDec.addEventListener("click",()=>{
+    if(S.decoders<=0) return;
+    S.decoders--; S.revealed=true; decoded.hidden=false; btnDec.disabled=true;
+    renderTop(); save();
+  });
+  document.getElementById("btnSend").addEventListener("click",()=>judge(t,k,doc,zones,slot,ctrl));
+}
+
+/* ── 語音示範（瀏覽器語音合成；不支援時自動降級） ── */
+const CAN_SPEAK = typeof window!=="undefined" && "speechSynthesis" in window
+  && typeof SpeechSynthesisUtterance!=="undefined";
+let VOICE=null;
+function pickVoice(){
+  try{
+    const vs=speechSynthesis.getVoices()||[];
+    VOICE = vs.find(v=>/^en[-_]US$/i.test(v.lang)&&/samantha|aria|jenny|zira|female/i.test(v.name))
+         || vs.find(v=>/^en[-_]US$/i.test(v.lang))
+         || vs.find(v=>/^en[-_]GB$/i.test(v.lang))
+         || vs.find(v=>/^en/i.test(v.lang)) || null;
+  }catch(e){}
+}
+if(CAN_SPEAK){ pickVoice(); speechSynthesis.addEventListener("voiceschanged",pickVoice); }
+function speak(text,slow,onend){
+  if(!CAN_SPEAK){ onend&&onend(); return; }
+  try{
+    speechSynthesis.cancel();
+    const u=new SpeechSynthesisUtterance(text);
+    u.lang="en-US"; if(VOICE) u.voice=VOICE;
+    u.rate = slow?0.6:0.9; u.pitch=1; u.volume=1;
+    u.onend=()=>onend&&onend(); u.onerror=()=>onend&&onend();
+    speechSynthesis.speak(u);
+  }catch(e){ onend&&onend(); }
+}
+/* 每關要唸的兩句：關鍵詞 + 整句。未手寫 say 的關卡由文件自動推導 */
+function sayables(k){
+  if(k.say) return k.say;
+  const d=document.createElement("div"); d.innerHTML=k.doc;
+  const z=d.querySelector('[data-z="'+k.ans+'"]');
+  const line=(z?z.textContent:"").replace(/\s+/g," ").trim();
+  return [k.decode[0][0], line];
+}
+
+/* ── 發音辨識與評分（門檻 88 分） ── */
+const PASS_MARK = 88;
+const SR = (typeof window!=="undefined") && (window.SpeechRecognition||window.webkitSpeechRecognition);
+const CAN_HEAR = !!SR;
+let micBlocked = false;   // 一旦確認拿不到麥克風，整場改走榮譽制
+
+const NUMW={zero:"0",one:"1",two:"2",three:"3",four:"4",five:"5",six:"6",seven:"7",eight:"8",
+  nine:"9",ten:"10",eleven:"11",twelve:"12",thirty:"30"};
+function norm(x){
+  return String(x||"").toLowerCase().replace(/[\u2018\u2019]/g,"'")
+    .replace(/[^a-z0-9'\s]/g," ").replace(/\s+/g," ").trim();
+}
+const tok=(x)=>norm(x).split(" ").filter(Boolean).map(w=>NUMW[w]||w);
+function lev(a,b){
+  if(a===b) return 0;
+  if(!a.length||!b.length) return Math.max(a.length,b.length);
+  let prev=[...Array(b.length+1).keys()];
+  for(let i=1;i<=a.length;i++){
+    const cur=[i];
+    for(let j=1;j<=b.length;j++)
+      cur[j]=Math.min(prev[j]+1,cur[j-1]+1,prev[j-1]+(a[i-1]===b[j-1]?0:1));
+    prev=cur;
+  }
+  return prev[b.length];
+}
+const sim=(a,b)=>!a.length&&!b.length?1:1-lev(a,b)/Math.max(a.length,b.length);
+
+/* 詞比對：字尾差異算詞形變化（寬容），字中換音算唸錯（嚴格）
+   —— 否則 shipping / shopping 這種只差一個字母、卻是不同字的錯會被放過 */
+function wordSim(a,b){
+  if(a===b) return 1;
+  const short=Math.min(a.length,b.length);
+  let pre=0; while(pre<short&&a[pre]===b[pre]) pre++;
+  if(pre===short && Math.abs(a.length-b.length)<=3) return 0.93;
+  return sim(a,b) * (pre>=3 ? 0.95 : 0.8);
+}
+
+/* 分數＝詞命中率(72%) + 整體相似度(28%)；同時回報漏掉哪些詞 */
+function pronScore(target,heard){
+  const T=tok(target), H=tok(heard);
+  if(!T.length) return {score:0,missed:[]};
+  const used=new Set(); let hit=0; const missed=[];
+  T.forEach(w=>{
+    let bi=-1,bs=0;
+    H.forEach((h,i)=>{ if(used.has(i))return; const v=wordSim(w,h); if(v>bs){bs=v;bi=i;} });
+    if(bs>=0.74){ hit+=bs; used.add(bi); } else if(w.length>2) missed.push(w);
+  });
+  const recall=hit/T.length;
+  const flat=sim(T.join(""),H.join(""));
+  return {score:Math.round(100*(0.72*recall+0.28*flat)), missed};
+}
+
+function listen(target,cb){
+  let r;
+  try{ r=new SR(); }catch(e){ cb({error:"unsupported"}); return null; }
+  r.lang="en-US"; r.interimResults=false; r.continuous=false; r.maxAlternatives=5;
+  let settled=false;
+  const finish=(o)=>{ if(settled)return; settled=true; cb(o); };
+  r.onresult=(e)=>{
+    const alts=[...e.results[0]].map(a=>a.transcript).filter(Boolean);
+    if(!alts.length){ finish({error:"no-speech"}); return; }
+    // 辨識引擎本身有誤差，取對他最有利的那個候選
+    let best={score:-1};
+    alts.forEach(txt=>{ const r2=pronScore(target,txt); if(r2.score>best.score) best={...r2,heard:txt}; });
+    finish(best);
+  };
+  r.onerror=(e)=>{
+    if(e.error==="not-allowed"||e.error==="service-not-allowed") micBlocked=true;
+    finish({error:e.error||"error"});
+  };
+  r.onend=()=>finish({error:"no-speech"});
+  try{ r.start(); }catch(e){ finish({error:"busy"}); }
+  return r;
+}
+const ERRS={
+  "no-speech":"沒聽到聲音。手機拿近一點，大聲一點再試。",
+  "audio-capture":"找不到麥克風。檢查一下裝置。",
+  "not-allowed":"這個頁面拿不到麥克風——它被放在網頁的框架裡，平台沒開放麥克風，所以連權限都不會問你。要用發音判定，請改開存到電腦上的那份檔案。",
+  "service-not-allowed":"這個瀏覽器或頁面不允許用麥克風。改用 Chrome／Safari 開存在電腦上的那份檔案。",
+  "network":"連線不穩，辨識送不出去。等一下再試。",
+  "busy":"上一次還在聽。等一秒再按。",
+  "unsupported":"這台裝置不支援發音辨識。",
+  "aborted":"錄音被中斷了，再按一次。"
+};
+
+function voiceGate(t,k,slot){
+  const pair=sayables(k), done=[false,false];
+  const useMic = CAN_HEAR && S.micMode && !micBlocked;
+  const panel=el(`<div class="voice">
+      <div class="tag">口頭回報 · 2 項${useMic?" · 通過 "+PASS_MARK+" 分":""}</div>
+      <p class="voice-note">${useMic
+        ? `先按「聽」，再按<strong>唸給我聽</strong>，對著手機把它唸出來。${PASS_MARK} 分才算過——唸不順就按「慢慢唸」多聽幾次。`
+        : `這台裝置沒辦法用麥克風判定，所以這一關由媽媽驗收：先按「聽」，<strong>唸給媽媽聽</strong>，她聽過了才按下面那顆。`}</p>
+    </div>`);
+  slot.appendChild(panel);
+
+  pair.forEach((txt,idx)=>{
+    const row=el(`<div class="vrow">
+        <div class="vtxt"><span class="n">第 ${idx+1} 句 ${idx?"· 整句":"· 關鍵詞"}</span>${txt}</div>
+        <div class="vbtns">
+          ${CAN_SPEAK?`<button class="vlisten">▶ 聽</button><button class="vslow">慢慢唸</button>`:""}
+          ${useMic?`<button class="vmic" disabled>🎙 唸給我聽</button>`
+                  :`<button class="vdone" ${CAN_SPEAK?"disabled":""}>媽媽聽我唸過了</button>`}
+        </div>
+        <div class="vslot"></div>
+      </div>`);
+    panel.appendChild(row);
+    const vslot=row.querySelector(".vslot");
+    const btns=()=>[...row.querySelectorAll("button")];
+    const unlock=()=>{ const m=row.querySelector(".vmic")||row.querySelector(".vdone"); if(m&&!done[idx]) m.disabled=false; };
+    let tries=0;
+
+    if(CAN_SPEAK){
+      const play=(slow)=>{
+        btns().forEach(b=>b.disabled=true); row.classList.add("speaking");
+        speak(txt,slow,()=>{ row.classList.remove("speaking");
+          btns().forEach(b=>b.disabled=false); unlock();
+          if(done[idx]) btns().forEach(b=>{ if(b.classList.contains("vmic")||b.classList.contains("vdone")) b.disabled=true; });
+        });
+      };
+      row.querySelector(".vlisten").addEventListener("click",()=>play(false));
+      row.querySelector(".vslow").addEventListener("click",()=>play(true));
+    }
+
+    const pass=(score)=>{
+      done[idx]=true;
+      S.spoken=(S.spoken||0)+1;
+      (S.marks=S.marks||[]).push(score); save();
+      const m=row.querySelector(".vmic")||row.querySelector(".vdone");
+      if(m){ m.disabled=true; m.classList.add("ok"); m.textContent="✓ 已回報"; }
+      if(done.every(Boolean)) nextBtn(t,slot);
+    };
+
+    if(useMic){
+      const mic=row.querySelector(".vmic");
+      mic.addEventListener("click",()=>{
+        if(done[idx]) return;
+        tries++;
+        btns().forEach(b=>b.disabled=true);
+        row.classList.add("hearing"); mic.textContent="● 正在聽…";
+        vslot.innerHTML="";
+        listen(txt,(r)=>{
+          row.classList.remove("hearing");
+          mic.textContent="🎙 再唸一次"; btns().forEach(b=>b.disabled=false);
+          if(r.error){
+            vslot.innerHTML="";
+            vslot.appendChild(el(`<div class="vres fail"><div class="vheard">${ERRS[r.error]||"辨識失敗，再試一次。"}</div></div>`));
+            if(micBlocked||r.error==="unsupported"||r.error==="service-not-allowed"){
+              S.micMode=false; save();   // 這台拿不到麥克風，自動退回媽媽驗收
+              const b=el(`<button class="vadult" style="width:100%;margin-top:8px">改成唸給媽媽聽 · 她聽過了就按這裡</button>`);
+              vslot.appendChild(b); b.addEventListener("click",()=>pass(0));
+            }
+            return;
+          }
+          const ok=r.score>=PASS_MARK;
+          vslot.innerHTML="";
+          vslot.appendChild(el(`<div class="vres ${ok?"pass":"fail"}">
+              <div class="vscore"><span class="num">${r.score}</span><span class="lab">${ok?"通過":"還沒到 "+PASS_MARK+" 分"}</span></div>
+              <div class="meter"><span style="width:${Math.min(100,r.score)}%"></span></div>
+              <div class="vheard">聽到的是：<i>${r.heard||"（聽不清楚）"}</i>${
+                r.missed&&r.missed.length?`<br>沒唸清楚：<b>${r.missed.join(" · ")}</b>`:""}</div>
+            </div>`));
+          if(ok){ mic.textContent="✓ "+r.score+" 分"; pass(r.score); return; }
+          if(tries>=3){
+            const b=el(`<button class="vadult" style="width:100%;margin-top:8px">試了三次 · 媽媽聽過了就按這裡放行</button>`);
+            vslot.querySelector(".vres").after(b);
+            b.addEventListener("click",()=>pass(r.score));
+          }
+        });
+      });
+    } else {
+      const bd=row.querySelector(".vdone");
+      bd.addEventListener("click",()=>{ if(!done[idx]) pass(0); });
+    }
+  });
+}
+
+function nextBtn(t,slot){
+  const last = S.i===t.tasks.length-1;
+  const b=el(`<button class="send" style="width:100%;margin-top:10px">${last?"結束賽程":"下一個任務"}</button>`);
+  slot.appendChild(b);
+  b.addEventListener("click",()=>{
+    S.i++; S.tries=0; S.revealed=false; S.sel=null; save(); render(); window.scrollTo(0,0);
+  });
+}
+
+function judge(t,k,doc,zones,slot,ctrl){
+  S.tries++;
+  const lock=()=>{ doc.classList.add("locked"); ctrl.remove();
+    zones.forEach(z=>{ z.classList.remove("sel"); if(z.dataset.z===k.ans) z.classList.add("right"); }); };
+
+  if(S.sel===k.ans){
+    const pts = S.tries===1 ? (S.revealed?2:3) : 1;
+    S.score+=pts; lock(); slot.innerHTML="";
+    slot.appendChild(el(`<div class="verdict ok">
+        <div class="v-head">◆ 情報確認 <span class="gain">+${pts} 分</span></div>
+        <p class="v-body">${k.payoff}</p></div>`));
+    voiceGate(t,k,slot);
+  } else if(S.tries===1){
+    const z=doc.querySelector(".z.sel"); if(z){ z.classList.remove("sel"); z.classList.add("wrong"); }
+    S.sel=null; document.getElementById("btnSend").disabled=true;
+    slot.innerHTML="";
+    slot.appendChild(el(`<div class="verdict no">
+        <div class="v-head">◆ 需要複查</div>
+        <p class="v-body">不是這一行。${k.hint}</p></div>`));
+  } else {
+    lock(); slot.innerHTML="";
+    slot.appendChild(el(`<div class="verdict no">
+        <div class="v-head">◆ 任務失敗 <span class="gain">+0 分</span></div>
+        <p class="v-body">${k.miss}<br><br>正解是綠色框起來那一行。下次先找它。</p></div>`));
+    voiceGate(t,k,slot);
+  }
+  save();
+}
+
+function renderFinal(t){
+  const max=t.tasks.length*3, pct=S.score/max;
+  const g = t.grades[pct>=.9?3:pct>=.66?2:pct>=.4?1:0];
+  if(!S.best[t.id] || S.score>S.best[t.id]) S.best[t.id]=S.score;
+  save();
+  stage.appendChild(el(`<div class="final">
+      <div class="tag">${t.name} 成績 ${bars(t.bars)}</div>
+      <div class="score">${S.score}<span style="font-size:20px;color:var(--dim)"> / ${max}</span></div>
+      <h2>${g}</h2>
+      <div class="tally">口頭回報 ${S.spoken||0} / ${t.tasks.length*2} 次${
+        (S.marks&&S.marks.filter(m=>m>0).length)
+          ? " · 發音平均 "+Math.round(S.marks.filter(m=>m>0).reduce((a,b)=>a+b,0)/S.marks.filter(m=>m>0).length)+" 分"
+          : ""}</div>
+      <div class="next"><span class="tag">解碼局備註</span>${t.close}</div>
+      <div class="ctrl" style="margin-top:2px">
+        <button class="ghost" id="again">重跑這個賽程</button>
+        <button class="send" id="back">回賽程選單</button>
+      </div>
+    </div>`));
+  document.getElementById("again").addEventListener("click",()=>startTier(t.id));
+  document.getElementById("back").addEventListener("click",()=>{ renderMenu(); window.scrollTo(0,0); });
+}
+
+document.getElementById("home").addEventListener("click",()=>{ renderMenu(); window.scrollTo(0,0); });
+
+function start(seed){
+  if(seed && seed.best) S=Object.assign(S,seed); else load();
+  if(S.tier && tier()) render(); else renderMenu();
+}
+window.claude?.hot?.snapshot?.(()=>S);
+if(window.claude?.hot?.ready) window.claude.hot.ready(start); else start(window.claude?.hot?.data);
+</script>
