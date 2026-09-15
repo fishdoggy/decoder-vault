@@ -200,6 +200,30 @@ button:focus-visible{outline:2px solid var(--amber);outline-offset:2px}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
 
+<script>
+/* 診斷用：iPad/iOS 上看不到 console，所以把錯誤直接畫在頁面上 */
+(function(){
+  function show(title,detail){
+    try{
+      var d=document.createElement("pre");
+      d.setAttribute("data-err","1");
+      d.style.cssText="background:#3A1414;color:#FFB4A2;padding:12px 13px;font:11px/1.6 ui-monospace,Menlo,monospace;"+
+        "white-space:pre-wrap;word-break:break-word;border:1px solid #7A2A2A;border-radius:9px;margin:12px 0";
+      d.textContent="⚠ "+title+"（請截圖給我）\n\n"+detail;
+      (document.body||document.documentElement).insertBefore(d,(document.body||document.documentElement).firstChild);
+    }catch(e){}
+  }
+  window.addEventListener("error",function(e){
+    show("程式錯誤", (e.message||"?")+"\n位置 行"+(e.lineno||"?")+" 欄"+(e.colno||"?")+
+      (e.error&&e.error.stack?"\n\n"+String(e.error.stack).split("\n").slice(0,4).join("\n"):""));
+  });
+  window.addEventListener("unhandledrejection",function(e){
+    show("未處理的錯誤", String((e.reason&&(e.reason.stack||e.reason.message))||e.reason||"?").slice(0,400));
+  });
+  window.__diag=show;
+})();
+</script>
+
 <div class="wrap">
   <div class="top">
     <button class="brand" id="home"><span class="dot"></span>解碼局</button>
@@ -721,8 +745,8 @@ function render(){
 }
 
 /* ── 語音示範（瀏覽器語音合成；不支援時自動降級） ── */
-const CAN_SPEAK = typeof window!=="undefined" && "speechSynthesis" in window
-  && typeof SpeechSynthesisUtterance!=="undefined";
+let CAN_SPEAK=false;
+try{ CAN_SPEAK = "speechSynthesis" in window && typeof SpeechSynthesisUtterance!=="undefined"; }catch(e){}
 let VOICE=null;
 function pickVoice(){
   try{
@@ -733,7 +757,10 @@ function pickVoice(){
          || vs.find(v=>/^en/i.test(v.lang)) || null;
   }catch(e){}
 }
-if(CAN_SPEAK){ pickVoice(); speechSynthesis.addEventListener("voiceschanged",pickVoice); }
+if(CAN_SPEAK){ try{ pickVoice();
+  if(speechSynthesis.addEventListener) speechSynthesis.addEventListener("voiceschanged",pickVoice);
+  else speechSynthesis.onvoiceschanged=pickVoice;
+}catch(e){} }
 function speak(text,slow,onend){
   if(!CAN_SPEAK){ onend&&onend(); return; }
   try{
@@ -756,7 +783,8 @@ function sayables(k){
 
 /* ── 發音辨識與評分（門檻 88 分） ── */
 const PASS_MARK = 88;
-const SR = (typeof window!=="undefined") && (window.SpeechRecognition||window.webkitSpeechRecognition);
+let SR=null;
+try{ SR = window.SpeechRecognition||window.webkitSpeechRecognition||null; }catch(e){}
 const CAN_HEAR = !!SR;
 let micBlocked = false;   // 一旦確認拿不到麥克風，整場改走榮譽制
 
@@ -1008,8 +1036,16 @@ function renderFinal(t){
 document.getElementById("home").addEventListener("click",()=>{ renderMenu(); window.scrollTo(0,0); });
 
 function start(seed){
-  if(seed && seed.best) S=Object.assign(S,seed); else load();
-  if(S.tier && tier()) render(); else renderMenu();
+  try{
+    if(seed && seed.best) S=Object.assign(S,seed); else load();
+    if(S.tier && tier()) render(); else renderMenu();
+  }catch(e){
+    // 存檔壞了或某一關資料有問題，也要能回到選單，不能留一片空白
+    if(window.__diag) window.__diag("啟動失敗，已重設進度", String(e&&(e.stack||e.message)||e).slice(0,400));
+    try{ localStorage.removeItem(KEY); }catch(_){}
+    S={tier:null,i:0,decoders:0,score:0,tries:0,revealed:false,sel:null,spoken:0,marks:[],micMode:false,best:{}};
+    try{ renderMenu(); }catch(_){}
+  }
 }
 window.claude?.hot?.snapshot?.(()=>S);
 if(window.claude?.hot?.ready) window.claude.hot.ready(start); else start(window.claude?.hot?.data);
