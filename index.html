@@ -87,6 +87,13 @@ body{background:var(--ink);color:var(--text);font-family:var(--sans);margin:0;
 .z.right{background:rgba(91,201,140,.2);box-shadow:0 0 0 2px var(--good);border-bottom-color:transparent}
 .z.wrong{background:rgba(255,116,82,.16);box-shadow:0 0 0 2px var(--bad);border-bottom-color:transparent}
 .doc.locked .z{cursor:default;pointer-events:none}
+.z{background:rgba(246,169,59,.08)}
+.hit{cursor:pointer;border-radius:5px;transition:background .12s;-webkit-tap-highlight-color:transparent}
+.hit:hover{background:#F0EFE8}
+.hit:active{background:#E8E7DE}
+.doc.locked .hit{cursor:default;pointer-events:none}
+.howto{margin:0;font-size:12.5px;color:var(--amber);line-height:1.6}
+.howto strong{color:#fff}
 
 .d-kicker{font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--paper-dim);
   font-family:var(--mono);margin-bottom:6px}
@@ -712,6 +719,7 @@ function render(){
       <div class="tag">檔案 ${k.code}</div>
       <p class="client">${k.client}</p>
       <p class="q">${k.q}</p>
+      <p class="howto">↓ 在下面的文件裡，<strong>點一下答案那一行</strong></p>
     </div>`));
 
   const doc = el(`<div class="doc">${k.doc}</div>`);
@@ -725,18 +733,26 @@ function render(){
 
   const ctrl = el(`<div class="ctrl">
       <button class="decode" id="btnDec">解碼器 ${S.decoders}</button>
-      <button class="send" id="btnSend" disabled>送出情報</button>
+      <button class="send" id="btnSend" disabled>先點出答案那一行</button>
     </div>`);
   stage.appendChild(ctrl);
   const slot = el(`<div id="vslot"></div>`);
   stage.appendChild(slot);
 
   const zones=[...doc.querySelectorAll(".z")];
-  zones.forEach(z=>z.addEventListener("click",()=>{
+  const pick=(z)=>{
     zones.forEach(o=>o.classList.remove("sel"));
     z.classList.add("sel"); S.sel=z.dataset.z;
-    document.getElementById("btnSend").disabled=false;
-  }));
+    const b=document.getElementById("btnSend");
+    b.disabled=false; b.textContent="送出情報";
+  };
+  zones.forEach(z=>z.addEventListener("click",()=>pick(z)));
+  // 可點的字只是一行裡的幾個詞，手指很難精準命中——讓整行都算，點哪裡都選得到
+  doc.querySelectorAll(".d-row,.d-fore,.d-key,.d-list li,.d-post").forEach(line=>{
+    const z=line.querySelector(".z"); if(!z) return;
+    line.classList.add("hit");
+    line.addEventListener("click",(e)=>{ if(e.target.closest(".z")) return; pick(z); });
+  });
 
   const btnDec=document.getElementById("btnDec");
   if(S.decoders<=0 || S.revealed) btnDec.disabled=true;
@@ -999,7 +1015,8 @@ function judge(t,k,doc,zones,slot,ctrl){
     voiceGate(t,k,slot);
   } else if(S.tries===1){
     const z=doc.querySelector(".z.sel"); if(z){ z.classList.remove("sel"); z.classList.add("wrong"); }
-    S.sel=null; document.getElementById("btnSend").disabled=true;
+    S.sel=null;
+    const bs=document.getElementById("btnSend"); bs.disabled=true; bs.textContent="再點一行看看";
     slot.innerHTML="";
     slot.appendChild(el(`<div class="verdict no">
         <div class="v-head">◆ 需要複查</div>
