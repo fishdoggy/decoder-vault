@@ -619,15 +619,15 @@ const ADVANCED = [
 
 const TIERS = [
   { id:"warmup", name:"熱身賽程", bars:1, decoders:6, tasks:WARMUP,
-    desc:"字很少，一眼就看得完。先確認一件事：你做得到。",
+    desc:"手機提示、包裝標示、告示牌。字很少，一眼就看得完。",
     grades:["還在暖身","進入狀況","節奏穩了","輕鬆完賽"],
     close:"這一段的英文，你其實本來就看得懂——只是以前沒人叫你去看。<br><br>準備好了就跑下一個賽程。那邊的文件字會變多，但方法完全一樣：<strong style=\"color:var(--amber)\">找那句會改變決定的話。</strong>" },
   { id:"standard", name:"標準賽程", bars:2, decoders:5, tasks:STANDARD,
-    desc:"真實的商品頁、樂高盒、改版公告、票券。有陷阱。",
+    desc:"網購賣場、包裹追蹤、串流平台、樂高盒、改版公告。有陷阱。",
     grades:["實習生","見習情報員","二級情報員","一級情報員"],
     close:"你剛剛做的事情，沒有一件是「背單字」。你是在一堆英文裡面，找出那句會改變決定的話。<br><br>最後一個賽程的文件，答案不會單獨躺在一行上——它藏在「如果…就…」裡面。" },
   { id:"advanced", name:"深層賽程", bars:3, decoders:3, tasks:ADVANCED,
-    desc:"整段英文，沒有圖。答案藏在條件句裡，還有人會給你錯的建議。",
+    desc:"訂閱條款、退貨規則、論壇問答。整段英文，答案藏在條件句裡。",
     grades:["需要複訓","勉強及格","深層解讀員","首席解讀員"],
     close:"這三份文件，大人也常常看錯。<br><br>接下來換真的：家裡真的要買的東西、真的要查的規則、你自己想加入的國外社群，<strong style=\"color:var(--amber)\">由你來讀。</strong>那不是遊戲的下一關，那是遊戲的目的。" }
 ];
@@ -661,7 +661,7 @@ function renderMenu(){
   stage.innerHTML="";
   stage.appendChild(el(`<div class="menu-head">
       <h1>選一個賽程</h1>
-      <p>每一份文件都是真的英文。你的工作有兩件：在裡面點出那句會改變決定的話，然後<strong style="color:var(--amber)">把它唸出聲音</strong>回報。</p>
+      <p>每一份文件都是日常生活中會遇見的狀況。你的工作有兩件：在裡面點出那句會改變決定的話，然後<strong style="color:var(--amber)">把它唸出聲音</strong>回報。</p>
     </div>`));
   const list=el(`<div class="bands"></div>`);
   TIERS.forEach(t=>{
