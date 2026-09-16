@@ -80,7 +80,7 @@ body{background:var(--ink);color:var(--text);font-family:var(--sans);margin:0;
 .doc::before{content:"INTERCEPTED";position:absolute;top:-8px;right:12px;font-family:var(--mono);
   font-size:9px;letter-spacing:.2em;background:var(--amber);color:#2A1B05;padding:2px 7px;
   border-radius:3px;font-weight:600}
-.z{cursor:pointer;border-radius:4px;padding:1px 3px;margin:0 -3px;border-bottom:1.5px dotted #B9B9B2;
+.z{cursor:pointer;border-radius:4px;padding:3px 4px;margin:0 -4px;border-bottom:1.5px dotted #B9B9B2;
   transition:background .12s,box-shadow .12s;-webkit-tap-highlight-color:transparent}
 .z:hover{background:#EDEDE6}
 .z.sel{background:var(--amber-wash);box-shadow:0 0 0 2px var(--amber);border-bottom-color:transparent}
@@ -113,7 +113,7 @@ body{background:var(--ink);color:var(--text);font-family:var(--sans);margin:0;
 .d-warn{background:#FFF4E0;border-left:3px solid #E0A020;padding:9px 11px;font-size:12.5px;
   line-height:1.65;margin-top:11px;border-radius:0 5px 5px 0}
 .d-meta{font-size:12.5px;color:var(--paper-dim);margin-top:3px}
-.d-para{font-size:13.5px;line-height:2;margin:0}
+.d-para{font-size:13.5px;line-height:2.2;margin:0}
 .lego{background:#D01012;color:#fff;font-weight:800;font-size:13px;letter-spacing:.06em;
   padding:4px 9px;border-radius:5px;display:inline-block}
 .d-key{display:flex;justify-content:space-between;gap:14px;padding:8px 0;font-size:14px;
@@ -280,19 +280,20 @@ const WARMUP = [
       <div class="d-key" style="border-bottom:none"><span class="z" data-z="map">Map</span><span class="cap">M</span></div>`
   },
   {
-    code:"SNACK-120G", say:["contains","It contains peanuts."],
-    client:'<span class="who">委託人：</span>我買了這包餅乾。可是表弟對花生過敏，很嚴重。',
-    q:"這包餅乾，表弟能不能吃？",
-    ans:"contains",
-    hint:"Contains 的意思是「裡面有」。那一行列了三樣東西——其中一個是 peanuts，花生。",
-    payoff:"太好了你有看。<b>Contains: peanuts</b>＝裡面有花生。我把這包收起來，另外買了一包給他。",
-    miss:"情報有誤。他吃了兩口就開始起紅疹，我們趕去了診所。",
-    decode:[["Contains","內含、裡面有"],["peanuts","花生"],["Best before","保存期限"]],
-    doc:`<div class="d-kicker">Snack packaging</div>
-      <h3 class="d-title" style="font-size:18px"><span class="z" data-z="name">Crunchy Choco Bites</span></h3>
-      <div class="d-row"><span class="k">Weight</span><span class="v"><span class="z" data-z="net">Net weight 120 g</span></span></div>
-      <div class="d-row"><span class="k">Allergens</span><span class="v"><span class="z" data-z="contains">Contains: milk, wheat, peanuts</span></span></div>
-      <div class="d-row"><span class="k">Date</span><span class="v"><span class="z" data-z="bb">Best before: 09 / 2027</span></span></div>`
+    code:"NUTRITION-30G", say:["serving size","One serving is half a bag."],
+    client:'<span class="who">委託人：</span>你說這包只有 150 大卡，所以可以整包吃掉。我看一下包裝。',
+    q:"包裝上寫的 150 大卡，是整包還是半包？",
+    ans:"serv",
+    hint:"Serving 是「一份」。Serving size 那行寫的就是「一份等於多少」——它寫 1/2 bag。",
+    payoff:"抓到了。<b>Serving size 1/2 bag</b>＝一份是半包。整包吃完是 300 大卡，不是 150。我們分兩天吃。",
+    miss:"情報有誤。你整包吃光，以為只有 150，其實吃了兩份的量。",
+    decode:[["Serving size","一份的量"],["per serving","每一份"],["Servings per bag","一包有幾份"]],
+    doc:`<div class="d-kicker">Nutrition label</div>
+      <h3 class="d-title" style="font-size:17px">Nutrition Facts</h3>
+      <div class="d-row"><span class="k">Serving size</span><span class="v"><span class="z" data-z="serv">1/2 bag (30 g)</span></span></div>
+      <div class="d-row"><span class="k">Servings per bag</span><span class="v"><span class="z" data-z="count">2</span></span></div>
+      <div class="d-row"><span class="k">Calories</span><span class="v"><span class="z" data-z="cal">150 per serving</span></span></div>
+      <div class="d-row"><span class="k">Total sugars</span><span class="v"><span class="z" data-z="sugar">12 g</span></span></div>`
   },
   {
     code:"WX-TPE", say:["tomorrow","It will rain tomorrow."],
@@ -310,21 +311,20 @@ const WARMUP = [
       <div class="d-fore" style="border-bottom:none"><span class="day"><span class="z" data-z="sat">Saturday</span></span><span class="tmp">25°</span><span>Cloudy</span></div>`
   },
   {
-    code:"PARTY-LEO", say:["swimwear","Bring your swimwear."],
-    client:'<span class="who">委託人：</span>你同學 Leo 的生日派對邀請卡。這週六。',
-    q:"去之前，要準備什麼帶去？",
-    ans:"bring",
-    hint:"Bring 的意思是「帶…來」。找 Bring 開頭那一行——swimwear 跟游泳有關。",
-    payoff:"泳衣帶了。<b>Bring swimwear</b>＝要帶泳衣，那邊有泳池。現場有一半的小孩忘了帶，只能坐在旁邊看。",
-    miss:"情報有誤。你什麼都沒帶，全場只有你不能下水。",
-    decode:[["Bring","帶…來"],["swimwear","泳衣"],["RSVP by","請在…前回覆"]],
-    doc:`<div class="d-kicker">Invitation</div>
-      <h3 class="d-title" style="font-size:19px">You're invited!</h3>
-      <div class="d-row"><span class="k">Occasion</span><span class="v"><span class="z" data-z="who">Leo's 10th Birthday</span></span></div>
-      <div class="d-row"><span class="k">When</span><span class="v"><span class="z" data-z="when">Sat 12 July, 2:00 PM</span></span></div>
-      <div class="d-row"><span class="k">Where</span><span class="v"><span class="z" data-z="where">Riverside Park</span></span></div>
-      <div class="d-warn"><span class="z" data-z="bring">Bring swimwear — we're using the pool!</span></div>
-      <div class="d-fine"><span class="z" data-z="rsvp">RSVP by 8 July.</span></div>`
+    code:"SCREENTIME", say:["more time","Ask for more time."],
+    client:'<span class="who">委託人：</span>你的平板跳出這個，你說你不知道要按哪一個。',
+    q:"想現在繼續玩，該按哪一個？",
+    ans:"ask",
+    hint:"Ask for 是「要求」，more time 是「更多時間」。另一個是「15 分鐘後再提醒我」——那不會讓你現在玩。",
+    payoff:"<b>Ask For More Time</b>＝要求更多時間，它會跳來問我。我給你多 15 分鐘，今天就這樣。",
+    miss:"情報有誤。你按了「15 分鐘後再提醒我」，那 15 分鐘你根本不能玩，只是等它再跳一次。",
+    decode:[["Ask For More Time","要求更多時間"],["Remind Me","稍後提醒我"],["limit","上限"]],
+    doc:`<div class="d-kicker">Screen Time</div>
+      <h3 class="d-title" style="font-size:18px">Time Limit Reached</h3>
+      <p class="d-para" style="font-size:13px;margin-bottom:10px">You've reached your limit for Games today.</p>
+      <div class="d-key"><span class="z" data-z="ask">Ask For More Time</span><span class="cap">›</span></div>
+      <div class="d-key"><span class="z" data-z="remind">Remind Me in 15 Minutes</span><span class="cap">›</span></div>
+      <div class="d-key" style="border-bottom:none"><span class="z" data-z="ignore">Ignore Limit For Today</span><span class="cap">›</span></div>`
   },
   {
     code:"POOL-RULES", say:["no diving","No diving in the shallow end."],
@@ -361,19 +361,20 @@ const WARMUP = [
       <div class="d-fine"><span class="z" data-z="photo">No flash photography.</span></div>`
   },
   {
-    code:"SHOP-HOURS", say:["closed","The shop is closed on Mondays."],
-    client:'<span class="who">委託人：</span>星期一放假，我想去這家店寫作業，那邊有 Wi-Fi。',
-    q:"星期一去，這家店開著嗎？",
-    ans:"closed",
-    hint:"別只看營業時間那行。Closed 的意思是「關門」——它後面接的是哪一天？",
-    payoff:"省了一趟。<b>Closed on Mondays</b>＝星期一公休。我們改星期二去，位子還很空。",
-    miss:"情報有誤。我們騎了 20 分鐘過去，門上掛著一塊木牌，店是暗的。",
-    decode:[["Closed","關門、公休"],["Mondays","星期一"],["Open","營業"]],
-    doc:`<div class="d-kicker">Shop front</div>
-      <h3 class="d-title" style="font-size:18px">Maker's Coffee</h3>
-      <div class="d-row"><span class="k">Hours</span><span class="v"><span class="z" data-z="open">Open 8:00 — 20:00</span></span></div>
-      <div class="d-row"><span class="k">Rest day</span><span class="v"><span class="z" data-z="closed">Closed on Mondays</span></span></div>
-      <div class="d-row"><span class="k">Extras</span><span class="v"><span class="z" data-z="wifi">Free Wi-Fi</span></span></div>`
+    code:"STORAGE-FULL", say:["available","Only a little space is available."],
+    client:'<span class="who">委託人：</span>你說平板裝不下新遊戲了。到底還剩多少空間？',
+    q:"還剩多少空間可以用？",
+    ans:"avail",
+    hint:"Available 是「可以用的」。上面那幾行是「已經被用掉的」——數字大不代表還能用。",
+    payoff:"<b>Available 0.4 GB</b>＝只剩 0.4 GB，難怪裝不下。照片佔了 42 GB，我們先把舊照片備份出來再刪。",
+    miss:"情報有誤。你以為還有 42 GB 可以用，結果遊戲下載到一半就失敗了。",
+    decode:[["Available","可以用的"],["Storage","儲存空間"],["Almost Full","快滿了"]],
+    doc:`<div class="d-kicker">Settings · Storage</div>
+      <h3 class="d-title" style="font-size:17px">Storage Almost Full</h3>
+      <div class="d-row"><span class="k">Photos</span><span class="v"><span class="z" data-z="photos">42.1 GB</span></span></div>
+      <div class="d-row"><span class="k">Games</span><span class="v"><span class="z" data-z="games">18.6 GB</span></span></div>
+      <div class="d-row"><span class="k">Videos</span><span class="v"><span class="z" data-z="videos">9.2 GB</span></span></div>
+      <div class="d-row"><span class="k">Available</span><span class="v"><span class="z" data-z="avail">0.4 GB</span></span></div>`
   },
   {
     code:"BOARDING-BR226", say:["gate","Find the boarding gate."],
@@ -450,24 +451,21 @@ const STANDARD = [
       </div>`
   },
   {
-    code:"STORE-SALE", say:["sale ends","The sale ends on Sunday."],
-    client:'<span class="who">委託人：</span>這款遊戲在特價。我這週末沒空，想星期一再買。',
-    q:"星期一還買得到這個價格嗎？",
-    ans:"ends",
-    hint:"找 ends 這個字——它的意思是「結束」。後面接的是哪一天？",
-    payoff:"來得及。<b>Sunday</b> 是星期天，特價星期天早上就結束了。我昨晚先刷下去，省了 24 美金。",
-    miss:"情報有誤。星期一打開來看，價錢已經跳回 $39.99 了。",
-    decode:[["Sale ends","特價結束於"],["Sunday","星期日"],["Platforms","可玩的機種"]],
-    doc:`<div class="d-kicker">Game Store</div>
-      <h3 class="d-title"><span class="z" data-z="name">SKY RAIDERS: Deluxe Edition</span></h3>
-      <div style="display:flex;align-items:baseline;gap:10px;margin-bottom:6px">
-        <span class="d-badge">-60%</span>
-        <span class="d-strike"><span class="z" data-z="old">$39.99</span></span>
-        <span class="d-price"><span class="z" data-z="new">$15.99</span></span>
-      </div>
-      <div class="d-warn"><span class="z" data-z="ends">Sale ends Sunday, 3 May at 10:00 AM.</span></div>
-      <div class="d-row" style="margin-top:10px"><span class="k">Platforms</span><span class="v"><span class="z" data-z="plat">PC, PS5, Xbox</span></span></div>
-      <div class="d-row"><span class="k">Modes</span><span class="v"><span class="z" data-z="mode">Single-player, Online Co-op</span></span></div>`
+    code:"STREAM-LEAVING", say:["leaving","It is leaving on September thirtieth."],
+    client:'<span class="who">委託人：</span>你說這部要追完四季。現在九月中，來得及嗎？',
+    q:"這部還能看到什麼時候？",
+    ans:"leave",
+    hint:"Leaving 是「離開」——在串流平台上就是「下架」。那一行後面接的是日期。",
+    payoff:"<b>Leaving on 30 September</b>＝九月三十號下架。剩兩個星期要看四季，我先幫你下載起來。",
+    miss:"情報有誤。你慢慢看，看到第二季的時候它就從平台上消失了。",
+    decode:[["Leaving on","於…下架"],["Seasons","季"],["Subtitles","字幕"]],
+    doc:`<div class="d-kicker">Streaming · Series</div>
+      <h3 class="d-title" style="font-size:18px">The Last Kingdom</h3>
+      <div class="d-meta">TV-14 · 4 Seasons · 2016</div>
+      <div class="d-warn"><span class="z" data-z="leave">Leaving on 30 September</span></div>
+      <div class="d-row" style="margin-top:9px"><span class="k">Audio</span><span class="v"><span class="z" data-z="audio">English, 中文</span></span></div>
+      <div class="d-row"><span class="k">Subtitles</span><span class="v"><span class="z" data-z="sub">English, 中文</span></span></div>
+      <div class="d-row"><span class="k">Download</span><span class="v"><span class="z" data-z="dl">Available</span></span></div>`
   },
   {
     code:"EBAY-PKM", say:["shipping","Shipping costs extra."],
@@ -509,37 +507,37 @@ const STANDARD = [
       <ul class="d-list"><li><span class="z" data-z="fix">Fixed crash when entering the Vault</span></li></ul>`
   },
   {
-    code:"LIMIT-SW2", say:["limit","Limit two per customer."],
-    client:'<span class="who">委託人：</span>這台超划算。我想一次買 5 台，自己留一台其他送人。',
-    q:"一個人可以買 5 台嗎？",
-    ans:"limit",
-    hint:"Limit 的意思是「上限」。per customer 是「每位客人」。",
-    payoff:"擋下來了。<b>Limit 2 per customer</b>＝一人最多 2 台。我分兩次下單，沒被系統取消。",
-    miss:"情報有誤。訂單送出後被賣家自動取消，還要等 7 天退款。",
-    decode:[["Limit","上限"],["per customer","每位客人"],["In stock","有現貨"]],
-    doc:`<div class="d-kicker">Online store</div>
-      <h3 class="d-title"><span class="z" data-z="name">Handheld Console — Starter Bundle</span></h3>
-      <div class="d-price" style="margin-bottom:8px"><span class="z" data-z="price">$449.99</span></div>
-      <div class="d-row"><span class="k">Availability</span><span class="v"><span class="z" data-z="stock">In stock — ships in 24 hours</span></span></div>
-      <div class="d-row"><span class="k">Shipping</span><span class="v"><span class="z" data-z="ship">Free over $50</span></span></div>
-      <div class="d-warn"><span class="z" data-z="limit">Limit 2 per customer.</span></div>`
+    code:"TRACK-CUSTOMS", say:["customs","It is held at customs."],
+    client:'<span class="who">委託人：</span>你的東西三個星期前就寄出了，怎麼還沒到？我把追蹤頁印出來。',
+    q:"包裹現在卡在哪裡？為什麼沒繼續送？",
+    ans:"held",
+    hint:"Held 是「被扣住」，customs 是「海關」。看最上面那一行。",
+    payoff:"<b>Held at customs</b>＝卡在海關，要補文件才會放行——不是運送慢。我今天去弄文件。",
+    miss:"情報有誤。我們又等了兩個星期，包裹一直在海關，最後被退回寄件人。",
+    decode:[["Held at customs","被海關扣住"],["released","放行"],["Delayed","延誤"]],
+    doc:`<div class="d-kicker">Order tracking</div>
+      <h3 class="d-title" style="font-size:16px">Order TW8842190</h3>
+      <div class="d-warn"><span class="z" data-z="held">Held at customs</span></div>
+      <div class="d-para" style="font-size:12.5px;margin-top:9px"><span class="z" data-z="doc">Your package needs extra documents before it can be released.</span></div>
+      <div class="d-row" style="margin-top:9px"><span class="k">Shipped</span><span class="v"><span class="z" data-z="ship">12 March</span></span></div>
+      <div class="d-row"><span class="k">In transit</span><span class="v"><span class="z" data-z="transit">15 March</span></span></div>
+      <div class="d-row"><span class="k">Delivery</span><span class="v"><span class="z" data-z="eta">Delayed</span></span></div>`
   },
   {
-    code:"TICKET-RX26", say:["doors open","The doors open at nine thirty."],
-    client:'<span class="who">委託人：</span>機器人展的票拿到了。我們幾點出門？想早點進去卡位。',
-    q:"最早幾點可以進場？",
-    ans:"doors",
-    hint:"表演開始的時間，跟開門讓人進去的時間，不是同一個。Doors 是「門」。",
-    payoff:"漂亮。<b>Doors open 9:30</b>＝9 點半就開門，表演 11 點才開始。我們 9 點到，排在前面。",
-    miss:"情報有誤。我們 11 點才到，好位子全被坐滿了。",
-    decode:[["Doors open","開放入場"],["Show starts","表演開始"],["entry","入場"]],
-    doc:`<div class="d-kicker">Admission ticket</div>
-      <h3 class="d-title"><span class="z" data-z="name">ROBOT EXPO 2026</span></h3>
-      <div class="d-row"><span class="k">Date</span><span class="v"><span class="z" data-z="date">Sat 18 Apr</span></span></div>
-      <div class="d-row"><span class="k">Doors</span><span class="v"><span class="z" data-z="doors">Doors open 9:30 AM</span></span></div>
-      <div class="d-row"><span class="k">Show</span><span class="v"><span class="z" data-z="show">Show starts 11:00 AM</span></span></div>
-      <div class="d-row"><span class="k">Venue</span><span class="v"><span class="z" data-z="hall">Hall 3, Taipei</span></span></div>
-      <div class="d-fine"><span class="z" data-z="id">Ticket holders must show ID at entry.</span></div>`
+    code:"SIZE-SHOES", say:["runs small","This model runs small."],
+    client:'<span class="who">委託人：</span>你的腳 23.5 公分。我照這張表選 US 5 就對了吧？',
+    q:"照這個賣場的說明，你該買哪一號？",
+    ans:"note",
+    hint:"表格本身沒錯，但下面那行黃色的提醒改變了答案。runs small 是「做得偏小」，one size up 是「大一號」。",
+    payoff:"幸好你看到下面那行。<b>runs small, order one size up</b>＝這款偏小要買大一號，所以是 US 6。",
+    miss:"情報有誤。US 5 寄來擠得穿不進去，退貨的運費還要自己付。",
+    decode:[["runs small","做得偏小"],["one size up","大一號"],["recommend","建議"]],
+    doc:`<div class="d-kicker">Size chart</div>
+      <h3 class="d-title" style="font-size:17px">Running Shoes</h3>
+      <div class="d-row"><span class="k">US 4</span><span class="v"><span class="z" data-z="s4">EU 36 · 22.5 cm</span></span></div>
+      <div class="d-row"><span class="k">US 5</span><span class="v"><span class="z" data-z="s5">EU 37 · 23.5 cm</span></span></div>
+      <div class="d-row"><span class="k">US 6</span><span class="v"><span class="z" data-z="s6">EU 38 · 24.5 cm</span></span></div>
+      <div class="d-warn"><span class="z" data-z="note">This model runs small. We recommend ordering one size up.</span></div>`
   },
   {
     code:"TUTORIAL-MC", say:["may not work","It may not work in newer versions."],
@@ -600,24 +598,22 @@ const ADVANCED = [
       </p>`
   },
   {
-    code:"ENTRY-JRC26", say:["parental consent","I need a parental consent form."],
-    client:'<span class="who">委託人：</span>你 11 歲，想報名這個機器人比賽。我把報名頁印出來給你。',
-    q:"你 11 歲。除了填表格，你還需要誰做一件事？",
-    ans:"consent",
-    hint:"你 11 歲，比 13 小。找有 under 13 的那一句——parental 跟「父母」有關，consent 是「同意」。",
-    payoff:"看懂了。<b>under 13 要家長簽同意書</b>。我先把那張表印出來給爸爸簽，才送得出去。順便注意到不能單人報名，我去找同學組隊。",
-    miss:"情報有誤。表格送出後被退回，說文件不齊，等我補件時報名已經截止了。",
-    decode:[["parental consent","家長同意"],["Eligibility","參加資格"],["Solo entries","單人報名"]],
-    doc:`<div class="d-kicker">Registration · 2026</div>
-      <h3 class="d-title" style="font-size:17px">Junior Robotics Challenge</h3>
-      <div class="d-warn"><span class="z" data-z="close">Registration closes 12 March, 23:59.</span></div>
-      <div class="d-sec">Eligibility</div>
+    code:"TRIAL-TERMS", say:["cancel","Cancel one day before it ends."],
+    client:'<span class="who">委託人：</span>你點了那個免費試用。七天後我不想付錢，什麼時候要取消？',
+    q:"要完全不被收到錢，最晚什麼時候得取消？",
+    ans:"cancel",
+    hint:"第一句只講試用幾天，第三句講的是被收錢之後的事。找有 not be charged 的那一句——provided 是「前提是」，at least one day before 是「至少在結束前一天」。",
+    payoff:"看懂了。<b>至少在結束前一天取消</b>才不會被收錢。第六天就設鬧鐘，不是等到第七天。",
+    miss:"情報有誤。你第七天才按取消，已經被扣了一個月，而且那筆退不回來。",
+    decode:[["provided","前提是"],["charged","被收費"],["renews automatically","自動續訂"]],
+    doc:`<div class="d-kicker">Free trial · Terms</div>
+      <h3 class="d-title" style="font-size:16px">Seven-Day Free Trial</h3>
       <p class="d-para">
-        <span class="z" data-z="age">Open to students aged 9–15.</span><br>
-        <span class="z" data-z="consent">Participants under 13 must submit a signed parental consent form.</span><br>
-        <span class="z" data-z="solo">Teams of 2–4. Solo entries are not accepted.</span>
-      </p>
-      <div class="d-row" style="margin-top:8px"><span class="k">Entry fee</span><span class="v"><span class="z" data-z="fee">Free</span></span></div>`
+        <span class="z" data-z="start">Your free trial starts today and lasts seven days.</span><br>
+        <span class="z" data-z="cancel">You will not be charged, provided you cancel at least one day before the trial ends.</span><br>
+        <span class="z" data-z="renew">After the trial, your subscription renews automatically every month.</span><br>
+        <span class="z" data-z="norefund">Cancelling after a charge does not refund that month.</span>
+      </p>`
   }
 ];
 
@@ -748,7 +744,7 @@ function render(){
   };
   zones.forEach(z=>z.addEventListener("click",()=>pick(z)));
   // 可點的字只是一行裡的幾個詞，手指很難精準命中——讓整行都算，點哪裡都選得到
-  doc.querySelectorAll(".d-row,.d-fore,.d-key,.d-list li,.d-post").forEach(line=>{
+  doc.querySelectorAll(".d-row,.d-fore,.d-key,.d-warn,.d-list li,.d-post").forEach(line=>{
     const z=line.querySelector(".z"); if(!z) return;
     line.classList.add("hit");
     line.addEventListener("click",(e)=>{ if(e.target.closest(".z")) return; pick(z); });
