@@ -324,23 +324,6 @@ const WARMUP = [
       <div class="d-fore" style="border-bottom:none"><span class="day"><span class="z" data-z="sat">Saturday</span></span><span class="tmp">25°</span><span>Cloudy</span></div>`
   },
   {
-    code:"SCREENTIME", say:["more time","Ask for more time."],
-    client:'<span class="who">委託人：</span>你的平板跳出這個，你說你不知道要按哪一個。',
-    q:"想現在繼續玩，該按哪一個？",
-    ans:"ask",
-    hint:"Ask for 是「要求」，more time 是「更多時間」。另一個是「15 分鐘後再提醒我」——那不會讓你現在玩。",
-    payoff:"<b>Ask For More Time</b>＝要求更多時間，它會跳來問我。我給你多 15 分鐘，今天就這樣。",
-    win:"多拿到 15 分鐘",
-    miss:"情報有誤。你按了「15 分鐘後再提醒我」，那 15 分鐘你根本不能玩，只是等它再跳一次。",
-    decode:[["Ask For More Time","要求更多時間"],["Remind Me","稍後提醒我"],["limit","上限"]],
-    doc:`<div class="d-kicker">Screen Time</div>
-      <h3 class="d-title" style="font-size:18px">Time Limit Reached</h3>
-      <p class="d-para" style="font-size:13px;margin-bottom:10px">You've reached your limit for Games today.</p>
-      <div class="d-key"><span class="z" data-z="ask">Ask For More Time</span><span class="cap">›</span></div>
-      <div class="d-key"><span class="z" data-z="remind">Remind Me in 15 Minutes</span><span class="cap">›</span></div>
-      <div class="d-key" style="border-bottom:none"><span class="z" data-z="ignore">Ignore Limit For Today</span><span class="cap">›</span></div>`
-  },
-  {
     code:"POOL-RULES", say:["no diving","No diving in the shallow end."],
     client:'<span class="who">委託人：</span>泳池邊立了一塊告示牌。你說你想從這邊跳下去。',
     q:"這一區可以跳水嗎？",
@@ -645,6 +628,29 @@ const ADVANCED = [
         <span class="z" data-z="norefund">Cancelling after a charge does not refund that month.</span>
       </p>`
   }
+];
+
+/* 暫時收起來的關卡。SCREENTIME（平板螢幕時間提示）在 2026-09-18 從熱身賽程撤下——
+   現實裡正要把遊戲時段從睡前搬到白天，遊戲裡卻讓他解碼出「多拿 15 分鐘」，
+   兩件事撞在一起會讓他覺得被涮。時段的事穩定幾週後把它搬回 WARMUP 即可。 */
+const SHELVED = [
+  {
+    code:"SCREENTIME", say:["more time","Ask for more time."],
+    client:'<span class="who">委託人：</span>你的平板跳出這個，你說你不知道要按哪一個。',
+    q:"想現在繼續玩，該按哪一個？",
+    ans:"ask",
+    hint:"Ask for 是「要求」，more time 是「更多時間」。另一個是「15 分鐘後再提醒我」——那不會讓你現在玩。",
+    payoff:"<b>Ask For More Time</b>＝要求更多時間，它會跳來問我。我給你多 15 分鐘，今天就這樣。",
+    win:"多拿到 15 分鐘",
+    miss:"情報有誤。你按了「15 分鐘後再提醒我」，那 15 分鐘你根本不能玩，只是等它再跳一次。",
+    decode:[["Ask For More Time","要求更多時間"],["Remind Me","稍後提醒我"],["limit","上限"]],
+    doc:`<div class="d-kicker">Screen Time</div>
+      <h3 class="d-title" style="font-size:18px">Time Limit Reached</h3>
+      <p class="d-para" style="font-size:13px;margin-bottom:10px">You've reached your limit for Games today.</p>
+      <div class="d-key"><span class="z" data-z="ask">Ask For More Time</span><span class="cap">›</span></div>
+      <div class="d-key"><span class="z" data-z="remind">Remind Me in 15 Minutes</span><span class="cap">›</span></div>
+      <div class="d-key" style="border-bottom:none"><span class="z" data-z="ignore">Ignore Limit For Today</span><span class="cap">›</span></div>`
+  },
 ];
 
 const TIERS = [
