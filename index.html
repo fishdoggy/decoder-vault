@@ -920,7 +920,9 @@ function voiceGate(t,k,slot){
       <div class="tag">口頭回報 · 2 項</div>
       <p class="voice-note">${useMic
         ? `先按「聽」，再按<strong>唸給我聽</strong>，對著手機把它唸出來。唸不順就按「慢慢唸」多聽幾次。`
-        : `這台裝置沒辦法用麥克風判定，所以這一關由媽媽驗收：先按「聽」，<strong>唸給媽媽聽</strong>，她聽過了才按下面那顆。`}</p>
+        : CAN_HEAR
+          ? `這一關由媽媽驗收：先按「聽」，<strong>唸給媽媽聽</strong>，她聽過了才按下面那顆。`
+          : `這台裝置沒辦法用麥克風判定，所以這一關由媽媽驗收：先按「聽」，<strong>唸給媽媽聽</strong>，她聽過了才按下面那顆。`}</p>
     </div>`);
   slot.appendChild(panel);
 
