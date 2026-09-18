@@ -1,6 +1,9 @@
 <!DOCTYPE html>
 <html lang="zh-Hant">
 <head>
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>解碼局 任務庫</title>
@@ -202,6 +205,10 @@ button:focus-visible{outline:2px solid var(--amber);outline-offset:2px}
 .score{font-family:var(--mono);font-size:46px;color:var(--amber);line-height:1;font-weight:600;
   font-variant-numeric:tabular-nums}
 .final p{font-size:14px;line-height:1.75;color:var(--dim);margin:0}
+.wins{border-top:1px solid var(--line);padding-top:15px;width:100%;text-align:left}
+.wins .wrow{font-size:14.5px;line-height:1.7;padding:6px 0 6px 15px;position:relative;color:var(--text)}
+.wins .wrow::before{content:"";position:absolute;left:0;top:14px;width:6px;height:6px;border-radius:50%;
+  background:var(--good)}
 .next{border-top:1px solid var(--line);padding-top:15px;font-size:13.5px;line-height:1.8;
   text-align:left;color:var(--text)}
 .next .tag{display:block;margin-bottom:7px}
@@ -209,6 +216,8 @@ button:focus-visible{outline:2px solid var(--amber);outline-offset:2px}
   text-transform:uppercase;padding-top:4px}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
+</head>
+<body>
 </head>
 <body>
 <script>
@@ -255,6 +264,7 @@ const WARMUP = [
     ans:"pw",
     hint:"Network 是「網路名稱」，Password 才是「密碼」。你要的是 Password 那一行。",
     payoff:"連上了。<b>Password</b> 那行才是密碼，coffee2026。網路名稱是另一回事。",
+    win:"連上網路了",
     miss:"情報有誤。我把網路名稱當密碼打了五次，手機還跳出「密碼錯誤」。",
     decode:[["Network","網路名稱"],["Password","密碼"],["Speed","速度"]],
     doc:`<div class="d-kicker">Table card</div>
@@ -270,6 +280,7 @@ const WARMUP = [
     ans:"jump",
     hint:"Jump 就是「跳」。找到 Jump 那一行，看它右邊寫什麼鍵。",
     payoff:"知道了。<b>Jump = Space</b>，空白鍵。我過第一關了。",
+    win:"過了第一關",
     miss:"情報有誤。我一直按錯鍵，卡在第一個坑裡跳不過去。",
     decode:[["Jump","跳躍"],["Sprint","衝刺"],["Move","移動"]],
     doc:`<div class="d-kicker">Settings</div>
@@ -286,6 +297,7 @@ const WARMUP = [
     ans:"serv",
     hint:"Serving 是「一份」。Serving size 那行寫的就是「一份等於多少」——它寫 1/2 bag。",
     payoff:"抓到了。<b>Serving size 1/2 bag</b>＝一份是半包。整包吃完是 300 大卡，不是 150。我們分兩天吃。",
+    win:"沒把整包 300 大卡當 150 吃掉",
     miss:"情報有誤。你整包吃光，以為只有 150，其實吃了兩份的量。",
     decode:[["Serving size","一份的量"],["per serving","每一份"],["Servings per bag","一包有幾份"]],
     doc:`<div class="d-kicker">Nutrition label</div>
@@ -302,6 +314,7 @@ const WARMUP = [
     ans:"tmr",
     hint:"Today 是今天，Tomorrow 是明天。看 Tomorrow 那一行寫什麼天氣——Rain 是「雨」。",
     payoff:"傘帶了。<b>Tomorrow — Rain</b>，明天下雨。我們改去室內的科教館，沒淋到。",
+    win:"沒淋到雨",
     miss:"情報有誤。我們在動物園門口被雨淋成落水狗。",
     decode:[["Tomorrow","明天"],["Rain","雨"],["Sunny","晴天"]],
     doc:`<div class="d-kicker">Weather</div>
@@ -317,6 +330,7 @@ const WARMUP = [
     ans:"ask",
     hint:"Ask for 是「要求」，more time 是「更多時間」。另一個是「15 分鐘後再提醒我」——那不會讓你現在玩。",
     payoff:"<b>Ask For More Time</b>＝要求更多時間，它會跳來問我。我給你多 15 分鐘，今天就這樣。",
+    win:"多拿到 15 分鐘",
     miss:"情報有誤。你按了「15 分鐘後再提醒我」，那 15 分鐘你根本不能玩，只是等它再跳一次。",
     decode:[["Ask For More Time","要求更多時間"],["Remind Me","稍後提醒我"],["limit","上限"]],
     doc:`<div class="d-kicker">Screen Time</div>
@@ -333,6 +347,7 @@ const WARMUP = [
     ans:"dive",
     hint:"No 開頭的那幾行都是「不可以」。diving 是「跳水」，shallow 是「淺」。",
     payoff:"還好你先看了。<b>No diving in the shallow end</b>＝淺水區禁止跳水，那邊只有 90 公分深。我們走到深水區那頭去跳。",
+    win:"沒往 90 公分深的水裡跳",
     miss:"情報有誤。你跳下去撞到池底，額頭腫了一個包，救生員吹哨把你叫上來。",
     decode:[["No diving","禁止跳水"],["shallow end","淺水區"],["adult","大人"]],
     doc:`<div class="d-kicker">Poolside sign</div>
@@ -351,6 +366,7 @@ const WARMUP = [
     ans:"free",
     hint:"Free 是「免費」。under 12 是「未滿 12 歲」。你 10 歲，比 12 小還是大？",
     payoff:"你免費進去的。<b>Free entry under 12</b>——我本來要掏 500，結果只付了自己那一份。",
+    win:"省下 500 元門票",
     miss:"情報有誤。我在售票口多買了一張票，進去以後才看到牌子，錢退不回來了。",
     decode:[["Free entry","免費入場"],["under 12","未滿 12 歲"],["Adults","大人"]],
     doc:`<div class="d-kicker">Entrance notice</div>
@@ -367,6 +383,7 @@ const WARMUP = [
     ans:"avail",
     hint:"Available 是「可以用的」。上面那幾行是「已經被用掉的」——數字大不代表還能用。",
     payoff:"<b>Available 0.4 GB</b>＝只剩 0.4 GB，難怪裝不下。照片佔了 42 GB，我們先把舊照片備份出來再刪。",
+    win:"舊照片先備份才刪",
     miss:"情報有誤。你以為還有 42 GB 可以用，結果遊戲下載到一半就失敗了。",
     decode:[["Available","可以用的"],["Storage","儲存空間"],["Almost Full","快滿了"]],
     doc:`<div class="d-kicker">Settings · Storage</div>
@@ -383,6 +400,7 @@ const WARMUP = [
     ans:"gate",
     hint:"Seat 是「座位」，那是上了飛機才用的。Gate 才是「登機門」。",
     payoff:"<b>Gate B12</b>。Gate 才是登機門，Seat 32K 是上飛機以後的位子。我們走對邊了。",
+    win:"沒走錯登機門",
     miss:"情報有誤。我們跑去 32 號閘口，那裡正在登機的是飛大阪的班機。",
     decode:[["Gate","登機門"],["Seat","座位"],["Boarding","開始登機"]],
     doc:`<div class="d-kicker">Boarding pass</div>
@@ -400,6 +418,7 @@ const WARMUP = [
     ans:"window",
     hint:"maintenance 是「維護」。看那段時間是幾點到幾點——23:00 就是晚上 11 點。",
     payoff:"上不去。<b>23:00 — 02:00</b> 是維護時間，offline＝伺服器關著。你早點睡，明天一早再打。",
+    win:"沒在維護時間白等",
     miss:"情報有誤。你 11 點半開電腦，卡在連線畫面等了一個小時。",
     decode:[["maintenance","維護"],["offline","離線、關閉"],["Log in","登入"]],
     doc:`<div class="d-kicker">Server status</div>
@@ -421,6 +440,7 @@ const STANDARD = [
     ans:"age",
     hint:"盒子上有一個地方直接寫了「幾歲以上」。Ages 是「年紀」的意思。",
     payoff:"情報確認。<b>Ages 8+</b> 是「8 歲以上」——6 歲太小了。我改買 CITY 系列 4+ 那盒，他自己就拆得開。",
+    win:"沒買到他拆不開的樂高",
     miss:"情報有誤。我照你說的買了，結果他拼到一半就哭著說太難。",
     decode:[["Ages 8+","適合 8 歲以上"],["pieces","零件數"],["Item","商品編號"]],
     doc:`<div class="lego">LEGO</div>
@@ -438,6 +458,7 @@ const STANDARD = [
     ans:"batt",
     hint:"答案藏在最下面的小字裡。included 是「已附上」的意思，那 not included 呢？",
     payoff:"幸好你看到了。<b>not included</b>＝沒有附。我在路上先去買了 2 顆 AA 電池，一到現場就能開。",
+    win:"電池先買好了",
     miss:"情報有誤。到現場才發現不會動，車子在桌上躺了一整個下午。",
     decode:[["not included","沒有附、不含"],["Requires","需要"],["Assembled","組裝完成後"]],
     doc:`<div class="d-kicker">Package back · small print</div>
@@ -457,6 +478,7 @@ const STANDARD = [
     ans:"leave",
     hint:"Leaving 是「離開」——在串流平台上就是「下架」。那一行後面接的是日期。",
     payoff:"<b>Leaving on 30 September</b>＝九月三十號下架。剩兩個星期要看四季，我先幫你下載起來。",
+    win:"四季在下架前下載好",
     miss:"情報有誤。你慢慢看，看到第二季的時候它就從平台上消失了。",
     decode:[["Leaving on","於…下架"],["Seasons","季"],["Subtitles","字幕"]],
     doc:`<div class="d-kicker">Streaming · Series</div>
@@ -474,6 +496,7 @@ const STANDARD = [
     ans:"ship",
     hint:"東西從國外寄過來，不會是免費的。找 Shipping 這個字。",
     payoff:"還好有問你。<b>Shipping $18.50</b> 是運費——實際要付 $60.50，不是 $42。我先去比了別家。",
+    win:"沒多付 US$18.50 運費",
     miss:"情報有誤。結帳的時候金額突然變多，錢不夠，訂單掛掉了。",
     decode:[["Shipping","運費"],["available","還有幾個可賣"],["Returns","退貨"]],
     doc:`<div class="d-kicker">Auction listing</div>
@@ -491,6 +514,7 @@ const STANDARD = [
     ans:"bow",
     hint:"reduced 的意思是「降低」，increased 是「提高」。Frost Bow 那行是哪一個？",
     payoff:"果然。傷害從 45 砍到 32，<b>reduced</b>＝變弱了。我今晚先改練別把武器，不浪費時間。",
+    win:"沒白練被砍弱的冰霜弓",
     miss:"情報有誤。我開開心心上線，結果一場都打不贏。",
     decode:[["reduced","降低、變弱"],["increased","提高、變長"],["unchanged","沒有改動"]],
     doc:`<div class="d-kicker">Official patch notes</div>
@@ -513,6 +537,7 @@ const STANDARD = [
     ans:"held",
     hint:"Held 是「被扣住」，customs 是「海關」。看最上面那一行。",
     payoff:"<b>Held at customs</b>＝卡在海關，要補文件才會放行——不是運送慢。我今天去弄文件。",
+    win:"包裹沒被退回寄件人",
     miss:"情報有誤。我們又等了兩個星期，包裹一直在海關，最後被退回寄件人。",
     decode:[["Held at customs","被海關扣住"],["released","放行"],["Delayed","延誤"]],
     doc:`<div class="d-kicker">Order tracking</div>
@@ -530,6 +555,7 @@ const STANDARD = [
     ans:"note",
     hint:"表格本身沒錯，但下面那行黃色的提醒改變了答案。runs small 是「做得偏小」，one size up 是「大一號」。",
     payoff:"幸好你看到下面那行。<b>runs small, order one size up</b>＝這款偏小要買大一號，所以是 US 6。",
+    win:"鞋子沒買錯號",
     miss:"情報有誤。US 5 寄來擠得穿不進去，退貨的運費還要自己付。",
     decode:[["runs small","做得偏小"],["one size up","大一號"],["recommend","建議"]],
     doc:`<div class="d-kicker">Size chart</div>
@@ -546,6 +572,7 @@ const STANDARD = [
     ans:"ver",
     hint:"影片作者自己留了一句警告。may not work 的意思是「可能不能用」——用在什麼情況？",
     payoff:"救了我兩小時。作者寫 <b>may not work in newer versions</b>——那是 1.16 的做法，我現在是 1.21。我去找新版的教學了。",
+    win:"省下兩小時",
     miss:"情報有誤。我照著蓋了兩個小時，紅石完全沒反應。",
     decode:[["may not work","可能不能用"],["newer versions","比較新的版本"],["views","觀看次數"]],
     doc:`<div class="d-kicker">Video page</div>
@@ -565,6 +592,7 @@ const ADVANCED = [
     ans:"r2",
     hint:"有兩個人只是說「我也一樣」，有一個人怪你的電腦。只有一則說出了「要動哪個東西」——而且它的票數最高。",
     payoff:"照第二則做了。<b>break and replace the beds</b>＝把床敲掉重放，不用拆整座農場。20 分鐘就修好了。",
+    win:"20 分鐘修好，沒拆整座農場",
     miss:"情報有誤。我把整座農場拆了重蓋，花了一整個週末，結果還是不會動。",
     decode:[["break and replace","敲掉重放"],["linking","綁定、連結"],["rebuild","整個重蓋"]],
     doc:`<div class="d-kicker">r/MinecraftHelp · 4 replies</div>
@@ -586,6 +614,7 @@ const ADVANCED = [
     ans:"opened",
     hint:"第一句講的是「沒拆封」的情況，跟你不一樣。找 Opened 開頭那一句——store credit 是「只能在這家店折抵的點數」，不是現金。",
     payoff:"清楚了。拆封過的只能換 <b>store credit</b>，退不到現金。我不換了，直接掛二手賣掉。",
+    win:"沒白跑一趟門市",
     miss:"情報有誤。我跑了一趟門市，店員指著條款念給我聽，我只能空手回家。",
     decode:[["provided","前提是、只要"],["unopened","未拆封的"],["store credit","店內折抵金"]],
     doc:`<div class="d-kicker">Returns &amp; refunds policy</div>
@@ -604,6 +633,7 @@ const ADVANCED = [
     ans:"cancel",
     hint:"第一句只講試用幾天，第三句講的是被收錢之後的事。找有 not be charged 的那一句——provided 是「前提是」，at least one day before 是「至少在結束前一天」。",
     payoff:"看懂了。<b>至少在結束前一天取消</b>才不會被收錢。第六天就設鬧鐘，不是等到第七天。",
+    win:"沒被自動續訂收錢",
     miss:"情報有誤。你第七天才按取消，已經被扣了一個月，而且那筆退不回來。",
     decode:[["provided","前提是"],["charged","被收費"],["renews automatically","自動續訂"]],
     doc:`<div class="d-kicker">Free trial · Terms</div>
@@ -620,20 +650,20 @@ const ADVANCED = [
 const TIERS = [
   { id:"warmup", name:"熱身賽程", bars:1, decoders:6, tasks:WARMUP,
     desc:"手機提示、包裝標示、告示牌。字很少，一眼就看得完。",
-    grades:["還在暖身","進入狀況","節奏穩了","輕鬆完賽"],
+    title:"見習情報員",
     close:"這一段的英文，你其實本來就看得懂——只是以前沒人叫你去看。<br><br>準備好了就跑下一個賽程。那邊的文件字會變多，但方法完全一樣：<strong style=\"color:var(--amber)\">找那句會改變決定的話。</strong>" },
   { id:"standard", name:"標準賽程", bars:2, decoders:5, tasks:STANDARD,
     desc:"網購賣場、包裹追蹤、串流平台、樂高盒、改版公告。有陷阱。",
-    grades:["實習生","見習情報員","二級情報員","一級情報員"],
+    title:"一級情報員",
     close:"你剛剛做的事情，沒有一件是「背單字」。你是在一堆英文裡面，找出那句會改變決定的話。<br><br>最後一個賽程的文件，答案不會單獨躺在一行上——它藏在「如果…就…」裡面。" },
   { id:"advanced", name:"深層賽程", bars:3, decoders:3, tasks:ADVANCED,
     desc:"訂閱條款、退貨規則、論壇問答。整段英文，答案藏在條件句裡。",
-    grades:["需要複訓","勉強及格","深層解讀員","首席解讀員"],
+    title:"首席解讀員",
     close:"這三份文件，大人也常常看錯。<br><br>接下來換真的：家裡真的要買的東西、真的要查的規則、你自己想加入的國外社群，<strong style=\"color:var(--amber)\">由你來讀。</strong>那不是遊戲的下一關，那是遊戲的目的。" }
 ];
 
-const KEY = "decoder-vault-v1";
-let S = { tier:null, i:0, decoders:0, score:0, tries:0, revealed:false, sel:null, spoken:0, marks:[], micMode:false, best:{} };
+const KEY = "decoder-vault-v2";
+let S = { tier:null, i:0, decoders:0, wins:[], tries:0, revealed:false, sel:null, spoken:0, micMode:false, done:{} };
 
 function load(){ try{ const r=localStorage.getItem(KEY); if(r) S=Object.assign(S,JSON.parse(r)); }catch(e){} }
 function save(){ try{ localStorage.setItem(KEY,JSON.stringify(S)); }catch(e){} }
@@ -665,14 +695,14 @@ function renderMenu(){
     </div>`));
   const list=el(`<div class="bands"></div>`);
   TIERS.forEach(t=>{
-    const b=S.best[t.id], max=t.tasks.length*3;
+    const dn=S.done&&S.done[t.id];
     const b_ = el(`<button class="band">
         <span class="band-top"><span class="band-name">${t.name}</span>${bars(t.bars)}</span>
         <p class="band-desc">${t.desc}</p>
         <span class="band-foot">
           <span>${t.tasks.length} 個任務</span>
           <span>解碼器 ${t.decoders}</span>
-          <span class="${b?"done":""}">${b?`最佳 ${b}/${max}`:"未執行"}</span>
+          <span class="${dn?"done":""}">${dn?"已歸檔":"未執行"}</span>
         </span>
       </button>`);
     b_.addEventListener("click",()=>startTier(t.id));
@@ -683,11 +713,11 @@ function renderMenu(){
   const mode=el(`<div class="modebar">
       <span class="lab">驗收方式</span>
       <button id="m-mom" class="${!S.micMode?"on":""}">媽媽聽</button>
-      <button id="m-mic" class="${S.micMode?"on":""}" ${CAN_HEAR?"":"disabled"}>麥克風 ${PASS_MARK} 分</button>
+      <button id="m-mic" class="${S.micMode?"on":""}" ${CAN_HEAR?"":"disabled"}>麥克風自己聽</button>
       <p class="modehint">${CAN_HEAR
         ? (S.micMode
-            ? `唸完由程式打分，${PASS_MARK} 分才過。第一次會問你要不要開麥克風，要按「允許」。`
-            : "唸給媽媽聽，她聽過了才按通過。想讓程式打分就切到右邊。")
+            ? "唸完由程式聽，唸清楚就過、沒唸清楚會告訴你是哪個字。第一次會問你要不要開麥克風，要按「允許」。"
+            : "唸給媽媽聽，她聽過了才按通過。想讓程式自己聽就切到右邊。")
         : "這個瀏覽器不支援麥克風辨識（換 Chrome 或 Safari 才有），現在只能用媽媽驗收。"}</p>
     </div>`);
   stage.appendChild(mode);
@@ -698,7 +728,7 @@ function renderMenu(){
 
 function startTier(id){
   const t=TIERS.find(x=>x.id===id);
-  S.tier=id; S.i=0; S.score=0; S.tries=0; S.revealed=false; S.sel=null; S.spoken=0; S.marks=[]; S.decoders=t.decoders;
+  S.tier=id; S.i=0; S.wins=[]; S.tries=0; S.revealed=false; S.sel=null; S.spoken=0; S.decoders=t.decoders;
   save(); render(); window.scrollTo(0,0);
 }
 
@@ -887,9 +917,9 @@ function voiceGate(t,k,slot){
   const pair=sayables(k), done=[false,false];
   const useMic = CAN_HEAR && S.micMode && !micBlocked;
   const panel=el(`<div class="voice">
-      <div class="tag">口頭回報 · 2 項${useMic?" · 通過 "+PASS_MARK+" 分":""}</div>
+      <div class="tag">口頭回報 · 2 項</div>
       <p class="voice-note">${useMic
-        ? `先按「聽」，再按<strong>唸給我聽</strong>，對著手機把它唸出來。${PASS_MARK} 分才算過——唸不順就按「慢慢唸」多聽幾次。`
+        ? `先按「聽」，再按<strong>唸給我聽</strong>，對著手機把它唸出來。唸不順就按「慢慢唸」多聽幾次。`
         : `這台裝置沒辦法用麥克風判定，所以這一關由媽媽驗收：先按「聽」，<strong>唸給媽媽聽</strong>，她聽過了才按下面那顆。`}</p>
     </div>`);
   slot.appendChild(panel);
@@ -937,8 +967,7 @@ function voiceGate(t,k,slot){
 
     const pass=(score)=>{
       done[idx]=true;
-      S.spoken=(S.spoken||0)+1;
-      (S.marks=S.marks||[]).push(score); save();
+      S.spoken=(S.spoken||0)+1; save();
       const m=row.querySelector(".vmic")||row.querySelector(".vdone");
       if(m){ m.disabled=true; m.classList.add("ok"); m.textContent="✓ 已回報"; }
       if(done.every(Boolean)) nextBtn(t,slot);
@@ -968,12 +997,12 @@ function voiceGate(t,k,slot){
           const ok=r.score>=PASS_MARK;
           vslot.innerHTML="";
           vslot.appendChild(el(`<div class="vres ${ok?"pass":"fail"}">
-              <div class="vscore"><span class="num">${r.score}</span><span class="lab">${ok?"通過":"還沒到 "+PASS_MARK+" 分"}</span></div>
+              <div class="vscore"><span class="lab">${ok?"聽清楚了":"再唸一次"}</span></div>
               <div class="meter"><span style="width:${Math.min(100,r.score)}%"></span></div>
               <div class="vheard">聽到的是：<i>${r.heard||"（聽不清楚）"}</i>${
                 r.missed&&r.missed.length?`<br>沒唸清楚：<b>${r.missed.join(" · ")}</b>`:""}</div>
             </div>`));
-          if(ok){ mic.textContent="✓ "+r.score+" 分"; pass(r.score); return; }
+          if(ok){ mic.textContent="✓ 已回報"; pass(r.score); return; }
           if(tries>=3){
             const b=el(`<button class="vadult" style="width:100%;margin-top:8px">試了三次 · 媽媽聽過了就按這裡放行</button>`);
             vslot.querySelector(".vres").after(b);
@@ -1003,10 +1032,9 @@ function judge(t,k,doc,zones,slot,ctrl){
     zones.forEach(z=>{ z.classList.remove("sel"); if(z.dataset.z===k.ans) z.classList.add("right"); }); };
 
   if(S.sel===k.ans){
-    const pts = S.tries===1 ? (S.revealed?2:3) : 1;
-    S.score+=pts; lock(); slot.innerHTML="";
+    (S.wins=S.wins||[]).push(k.win); lock(); slot.innerHTML="";
     slot.appendChild(el(`<div class="verdict ok">
-        <div class="v-head">◆ 情報確認 <span class="gain">+${pts} 分</span></div>
+        <div class="v-head">◆ 情報確認</div>
         <p class="v-body">${k.payoff}</p></div>`));
     voiceGate(t,k,slot);
   } else if(S.tries===1){
@@ -1020,26 +1048,23 @@ function judge(t,k,doc,zones,slot,ctrl){
   } else {
     lock(); slot.innerHTML="";
     slot.appendChild(el(`<div class="verdict no">
-        <div class="v-head">◆ 任務失敗 <span class="gain">+0 分</span></div>
-        <p class="v-body">${k.miss}<br><br>正解是綠色框起來那一行。下次先找它。</p></div>`));
+        <div class="v-head">◆ 委託人回報</div>
+        <p class="v-body">${k.miss}<br><br>那句話是綠色框起來那一行。下次先找它。</p></div>`));
     voiceGate(t,k,slot);
   }
   save();
 }
 
 function renderFinal(t){
-  const max=t.tasks.length*3, pct=S.score/max;
-  const g = t.grades[pct>=.9?3:pct>=.66?2:pct>=.4?1:0];
-  if(!S.best[t.id] || S.score>S.best[t.id]) S.best[t.id]=S.score;
-  save();
+  const wins=(S.wins||[]).filter(Boolean);
+  S.done[t.id]=true; save();
   stage.appendChild(el(`<div class="final">
-      <div class="tag">${t.name} 成績 ${bars(t.bars)}</div>
-      <div class="score">${S.score}<span style="font-size:20px;color:var(--dim)"> / ${max}</span></div>
-      <h2>${g}</h2>
-      <div class="tally">口頭回報 ${S.spoken||0} / ${t.tasks.length*2} 次${
-        (S.marks&&S.marks.filter(m=>m>0).length)
-          ? " · 發音平均 "+Math.round(S.marks.filter(m=>m>0).reduce((a,b)=>a+b,0)/S.marks.filter(m=>m>0).length)+" 分"
-          : ""}</div>
+      <div class="tag">${t.name} 情報歸檔 ${bars(t.bars)}</div>
+      <h2>${t.title}</h2>
+      <div class="wins">${wins.length
+        ? `<span class="tag">因為你看懂了，所以</span>`+wins.map(w=>`<div class="wrow">${w}</div>`).join("")
+        : `<span class="tag">這一輪沒有情報送到委託人手上</span>`}</div>
+      <div class="tally">口頭回報 ${S.spoken||0} 次</div>
       <div class="next"><span class="tag">解碼局備註</span>${t.close}</div>
       <div class="ctrl" style="margin-top:2px">
         <button class="ghost" id="again">重跑這個賽程</button>
@@ -1054,18 +1079,20 @@ document.getElementById("home").addEventListener("click",()=>{ renderMenu(); win
 
 function start(seed){
   try{
-    if(seed && seed.best) S=Object.assign(S,seed); else load();
+    if(seed && seed.done) S=Object.assign(S,seed); else load();
     if(S.tier && tier()) render(); else renderMenu();
   }catch(e){
     // 存檔壞了或某一關資料有問題，也要能回到選單，不能留一片空白
     if(window.__diag) window.__diag("啟動失敗，已重設進度", String(e&&(e.stack||e.message)||e).slice(0,400));
     try{ localStorage.removeItem(KEY); }catch(_){}
-    S={tier:null,i:0,decoders:0,score:0,tries:0,revealed:false,sel:null,spoken:0,marks:[],micMode:false,best:{}};
+    S={tier:null,i:0,decoders:0,wins:[],tries:0,revealed:false,sel:null,spoken:0,micMode:false,done:{}};
     try{ renderMenu(); }catch(_){}
   }
 }
 window.claude?.hot?.snapshot?.(()=>S);
 if(window.claude?.hot?.ready) window.claude.hot.ready(start); else start(window.claude?.hot?.data);
 </script>
+</body>
+</html>
 </body>
 </html>
